@@ -1,0 +1,129 @@
+//@version=5
+indicator("Innovativer Indikator mit Positionssignalen", overlay=true)
+
+// === Parameter ===
+ma_length = input.int(200, minval=1, title="EMA Länge")
+rsi_length = input.int(14, minval=1, title="RSI Länge")
+risk_reward_ratio = input.float(3.0, minval=1.0, title="Risk-Reward-Verhältnis")
+stop_loss_percent = input.float(5.34, minval=0.1, title="Stop Loss %", step=0.01)
+
+min_bars_between_signals = input.int(20, minval=1, title="Minimum Bars Between Signals")
+max_signals_visible = input.int(5, minval=1, title="Maximum Visible Signals")
+
+// === Sichtbarkeitseinstellungen ===
+var string grp_visibility = "Sichtbarkeit"
+show_ema = input.bool(true, "EMA anzeigen", group=grp_visibility)
+show_background = input.bool(true, "Hintergrundfarbe anzeigen", group=grp_visibility)
+show_long_boxes = input.bool(true, "Long-Setup-Boxen anzeigen", group=grp_visibility)
+show_short_boxes = input.bool(true, "Short-Setup-Boxen anzeigen", group=grp_visibility)
+show_labels = input.bool(true, "Labels anzeigen", group=grp_visibility)
+show_take_profit_markers = input.bool(true, "Take Profit Marker anzeigen", group=grp_visibility)
+show_stats = input.bool(true, "Performance-Statistik anzeigen", group=grp_visibility)
+
+// === Statistik Variablen ===
+var int trades_won = 0
+var int trades_lost = 0
+
+var int[] signal_bars = array.new_int()
+var box[] signal_boxes = array.new_box()
+var label[] signal_labels = array.new_label()
+
+// === Indikatoren Berechnung ===
+ema = ta.ema(close, ma_length)
+rsi = ta.rsi(close, rsi_length)
+
+// === Signale ===
+long_signal = ta.crossover(close, ema) and rsi < 70
+short_signal = ta.crossunder(close, ema) and rsi > 30
+
+// === Trade Tracking ===
+var table stats_table = table.new(position=position.top_right, columns=2, rows=3, bgcolor=color.new(color.black, 90))
+
+// === Position und Visualisierung ===
+var float entry_price = na
+var float stop_loss = na
+var float take_profit = na
+var bool in_position = false
+var bool is_long_position = false
+
+// === Setup-Boxen und Labels ===
+generate_signal = false
+if (long_signal or short_signal) and array.size(signal_bars) < max_signals_visible
+    if array.size(signal_bars) == 0 or (bar_index - array.get(signal_bars, array.size(signal_bars) - 1)) >= min_bars_between_signals
+        generate_signal := true
+        array.push(signal_bars, bar_index)
+
+        // Remove oldest signal if we've reached the maximum
+        if array.size(signal_bars) > max_signals_visible
+            array.shift(signal_bars)
+            box.delete(array.shift(signal_boxes))
+            label.delete(array.shift(signal_labels))
+
+if generate_signal
+    entry_price := close
+    stop_loss := long_signal ? close * (1 - stop_loss_percent / 100) : close * (1 + stop_loss_percent / 100)
+    take_profit := long_signal ? close + (close - stop_loss) * risk_reward_ratio : close - (stop_loss - close) * risk_reward_ratio
+    in_position := true
+    is_long_position := long_signal
+
+    box_width = math.min(40, min_bars_between_signals)
+    
+    if long_signal and show_long_boxes
+        b = box.new(bar_index, take_profit, bar_index + box_width, stop_loss, bgcolor=color.new(color.green, 90), border_color=color.new(color.green, 0))
+        array.push(signal_boxes, b)
+    
+    if short_signal and show_short_boxes
+        b = box.new(bar_index, stop_loss, bar_index + box_width, take_profit, bgcolor=color.new(color.red, 90), border_color=color.new(color.red, 0))
+        array.push(signal_boxes, b)
+    
+    if show_labels
+        l = label.new(
+            bar_index, 
+            long_signal ? low : high, 
+            text=long_signal ? "LONG" : "SHORT" + "\nSL: " + str.tostring(stop_loss, "#.##") + "\nTP: " + str.tostring(take_profit, "#.##") + "\nR:R 1:" + str.tostring(risk_reward_ratio), 
+            color=long_signal ? color.green : color.red, 
+            style=long_signal ? label.style_label_up : label.style_label_down, 
+            textcolor=color.white
+        )
+        array.push(signal_labels, l)
+
+// === Hintergrundfarben ===
+bgcolor(show_background ? (long_signal ? color.new(color.green, 90) : short_signal ? color.new(color.red, 90) : na) : na)
+
+// === Position Überwachung ===
+if in_position
+    if is_long_position
+        if high >= take_profit
+            if show_take_profit_markers
+                label.new(bar_index, take_profit, text="TP", style=label.style_circle, color=color.blue, textcolor=color.white)
+            trades_won := trades_won + 1
+            in_position := false
+        else if low <= stop_loss
+            trades_lost := trades_lost + 1
+            in_position := false
+    else
+        if low <= take_profit
+            if show_take_profit_markers
+                label.new(bar_index, take_profit, text="TP", style=label.style_circle, color=color.blue, textcolor=color.white)
+            trades_won := trades_won + 1
+            in_position := false
+        else if high >= stop_loss
+            trades_lost := trades_lost + 1
+            in_position := false
+
+// === Berechnung der Statistik ===
+total_trades = trades_won + trades_lost
+win_percentage = total_trades > 0 ? (trades_won / total_trades) * 100 : 0
+
+// === Statistik anzeigen ===
+if show_stats
+    table.cell(stats_table, 0, 0, "Gewonnene Trades:", text_color=color.white, text_size=size.small)
+    table.cell(stats_table, 1, 0, str.tostring(trades_won), text_color=color.white, text_size=size.small)
+    table.cell(stats_table, 0, 1, "Verlorene Trades:", text_color=color.white, text_size=size.small)
+    table.cell(stats_table, 1, 1, str.tostring(trades_lost), text_color=color.white, text_size=size.small)
+    table.cell(stats_table, 0, 2, "Gewinnrate (%):", text_color=color.white, text_size=size.small)
+    table.cell(stats_table, 1, 2, str.tostring(win_percentage, "#.##") + " %", text_color=color.white, text_size=size.small)
+
+// === Plot ===
+plot(show_ema ? ema : na, color=color.new(color.blue, 0), title="EMA")
+
