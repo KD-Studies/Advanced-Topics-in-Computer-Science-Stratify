@@ -1,1 +1,1 @@
-# TRIndicator
+# TradingView-Indicator
