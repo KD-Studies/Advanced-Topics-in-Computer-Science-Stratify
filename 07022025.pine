@@ -1,0 +1,66 @@
+//@version=6
+strategy("Improved Strategy with Indicators", overlay=true, commission_type=strategy.commission.percent, commission_value=0.1, slippage=3, default_qty_type=strategy.percent_of_equity, default_qty_value=100, margin_long=0)
+
+// User Inputs
+startDate = input.time(timestamp("2018-01-01 00:00"), title="Start Date")
+endDate = input.time(timestamp("2069-12-31 23:59"), title="End Date")
+
+// Indicator Components
+// Bollinger Bands
+bbLength = input.int(20, title="BB Length")
+bbMult = input.float(2.0, title="BB Multiplier")
+bbBasis = ta.sma(close, bbLength)
+bbUpper = bbBasis + bbMult * ta.stdev(close, bbLength)
+bbLower = bbBasis - bbMult * ta.stdev(close, bbLength)
+
+// RSI
+rsiLength = input.int(14, title="RSI Length")
+rsiSource = input.source(close, title="RSI Source")
+rsiValue = ta.rsi(rsiSource, rsiLength)
+
+// SMA
+smaLength = input.int(50, title="SMA Length")
+smaValue = ta.sma(close, smaLength)
+
+// EMA
+emaLength = input.int(50, title="EMA Length")
+emaValue = ta.ema(close, emaLength)
+
+// ADX
+adxLength = input.int(14, title="ADX Length")
+adxSmoothing = input.int(14, title="ADX Smoothing")
+[diplus, diminus, adxValue] = ta.dmi(adxLength, adxSmoothing)
+
+// MACD
+macdFast = input.int(12, title="MACD Fast Length")
+macdSlow = input.int(26, title="MACD Slow Length")
+macdSignal = input.int(9, title="MACD Signal Length")
+[macdLine, macdSignalLine, _] = ta.macd(close, macdFast, macdSlow, macdSignal)
+
+// Stochastic RSI
+stochLength = input.int(14, title="Stochastic RSI Length")
+stochRSIK = ta.stoch(close, high, low, stochLength)
+stochRSID = ta.sma(stochRSIK, 3)
+
+// Entry Condition
+longCondition = (stochRSIK > 80 or stochRSIK < 20) and rsiValue < 30 and adxValue > 25
+exitCondition = ta.crossover(rsiValue, 50) // Exit when RSI crosses above 50
+
+// Strategy Logic
+if (time >= startDate and time <= endDate)
+    if (longCondition)
+        strategy.entry("Long", strategy.long)
+    if (exitCondition)
+        strategy.close("Long")
+
+// Strategy Tester - Performance Metrics
+strategy.risk.max_drawdown(10, strategy.percent_of_equity)
+strategy.risk.max_position_size(100)
+strategy.risk.max_intraday_filled_orders(10)
+strategy.risk.max_intraday_loss(5, strategy.percent_of_equity)
+
+// Plot other indicators for reference
+plot(bbUpper, title="BB Upper", color=color.new(color.green, 80))
+plot(bbLower, title="BB Lower", color=color.new(color.red, 80))
+plot(smaValue, title="SMA", color=color.yellow)
+plot(emaValue, title="EMA", color=color.purple)
