@@ -1,69 +1,104 @@
 "use client";
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useTheme } from '@/context/ThemeContext'; // Theme-Hook importieren
+import Footer from '@/components/Footer';
 
-export default function LoginPage() {
+export default function Login() {
   const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { darkMode } = useTheme(); // Dark Mode-Status abrufen
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Hier würde normalerweise die Login-Logik stehen
+    router.push('/depot');
+  };
 
   return (
-    <main className="bg-gradient-to-br from-[#0f0f0f] to-[#1a1a1a] min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-sm bg-[#1e1e1e] border border-gray-700 rounded-xl p-8 shadow-lg text-white">
-        <h1 className="text-3xl font-extrabold mb-6 text-center">Login</h1>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            // Optional: Login-Logik hier
-            router.push('/depot');
-          }}
-          className="space-y-4"
-        >
-          <div>
-            <label className="block mb-1 font-semibold">E-Mail</label>
-            <input
-              type="email"
-              className="w-full px-3 py-2 rounded bg-[#2a2a2a] outline-none focus:ring-2 focus:ring-purple-600"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-semibold">Passwort</label>
-            <input
-              type="password"
-              className="w-full px-3 py-2 rounded bg-[#2a2a2a] outline-none focus:ring-2 focus:ring-pink-500"
-            />
-          </div>
-          <div className="flex justify-end">
-            <button type="button" className="text-xs text-purple-400 hover:text-purple-300">
-              Passwort vergessen?
-            </button>
-          </div>
-          <button
-            type="submit"
-            className="w-full py-2 mt-4 rounded bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 font-semibold transition transform hover:scale-105"
-          >
-            Einloggen
-          </button>
-        </form>
-        
-        <div className="mt-6 text-center border-t border-gray-700 pt-4">
-          <p className="text-sm text-gray-400 mb-2">
-            Noch kein Konto? 
-          </p>
-          <button
-            onClick={() => router.push('/auth/register')}
-            className="w-full py-2 rounded border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-medium transition"
-          >
-            Jetzt registrieren
-          </button>
+    <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
+      {/* Vertikale Linie als Design-Element */}
+      <div className={`fixed h-screen w-px ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} left-1/2 -translate-x-1/2 z-0 transition-colors duration-300`}></div>
+      
+      {/* Header mit Logo */}
+      <header className="py-8 text-center relative z-10">
+        <div className="flex items-center justify-center">
+          <Image 
+            src={darkMode ? "/stratify-logo-transparent-weiß.png" : "/stratify-logo-transparent-schwarz.png"}
+            alt="Stratify Logo" 
+            width={40} 
+            height={40}
+            className="mr-2"
+          />
+          <span className="text-sm font-light text-red-500 tracking-widest uppercase ml-1">Stratify</span>
         </div>
-        
-        <div className="mt-4 text-center">
-          <button
-            onClick={() => router.push('/')}
-            className="text-sm text-gray-400 hover:text-gray-200 transition"
-          >
-            Zurück zur Startseite
-          </button>
+      </header>
+      
+      {/* Login Form */}
+      <div className="flex-grow flex items-center justify-center px-6 relative z-10">
+        <div className="w-full max-w-md">
+          <h1 className="text-3xl font-serif mb-10 text-center">Anmelden</h1>
+          
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <label className={`block text-sm font-light ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
+                  darkMode 
+                    ? 'bg-gray-800 text-white border-gray-700' 
+                    : 'bg-white text-gray-900 border-gray-300'
+                }`}
+                required
+              />
+            </div>
+            
+            <div>
+              <label className={`block text-sm font-light ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>Passwort</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
+                  darkMode 
+                    ? 'bg-gray-800 text-white border-gray-700' 
+                    : 'bg-white text-gray-900 border-gray-300'
+                }`}
+                required
+              />
+            </div>
+            
+            <div className="pt-4">
+              <button
+                type="submit"
+                className={`w-full py-3 border text-red-500 hover:bg-red-500 hover:text-white transition-colors duration-300 font-light tracking-wide ${
+                  darkMode 
+                    ? 'bg-gray-900 border-red-500' 
+                    : 'bg-white border-red-500'
+                }`}
+              >
+                ANMELDEN
+              </button>
+            </div>
+          </form>
+          
+          <div className="mt-8 text-center text-sm font-light">
+            <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+              Noch kein Konto?{' '}
+              <Link href="/auth/register" className="text-red-500 hover:underline">
+                Registrieren
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
+      
+      <Footer />
     </main>
   );
 }

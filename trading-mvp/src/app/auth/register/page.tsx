@@ -1,198 +1,255 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import Footer from '@/components/Footer';
+import { useTheme } from '@/context/ThemeContext'; // Theme-Hook importieren
+import ThemeToggle from '@/components/ThemeToggle'; // ThemeToggle importieren
 
-export default function RegisterPage() {
+export default function Register() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [selectedPlan, setSelectedPlan] = useState<string>('pro'); // Default to Pro
+  const initialPlan = searchParams.get('plan') || 'basic';
+  const { darkMode } = useTheme(); // Dark Mode-Status abrufen
   
-  useEffect(() => {
-    // Überprüfe, ob ein Plan in den URL-Parametern vorhanden ist
-    const planParam = searchParams.get('plan');
-    if (planParam && ['basic', 'pro', 'deluxe'].includes(planParam)) {
-      setSelectedPlan(planParam);
+  const [selectedPlan, setSelectedPlan] = useState(initialPlan);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    firstName: '',
+    lastName: '',
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Hier würde die Registrierungslogik mit dem ausgewählten Plan implementiert werden
+    console.log('Registrierung mit Plan:', selectedPlan);
+    router.push('/depot');
+  };
+
+  // Planinformationen
+  const plans = {
+    basic: {
+      name: "Basic",
+      price: "19,99€",
+      features: [
+        "1 aktiver Trade",
+        "Standard KI-Modell",
+        "Basis-Dashboard"
+      ],
+      recommended: false
+    },
+    pro: {
+      name: "Pro",
+      price: "34,99€",
+      features: [
+        "Bis zu 3 Trades gleichzeitig",
+        "KI mit höherer Präzision",
+        "Performance Analytics"
+      ],
+      recommended: true
+    },
+    deluxe: {
+      name: "Deluxe",
+      price: "49,99€",
+      features: [
+        "Unlimitierte Trades",
+        "Custom KI-Strategien",
+        "Priorisierter Support"
+      ],
+      recommended: false
     }
-  }, [searchParams]);
+  };
 
   return (
-    <main className="bg-gradient-to-br from-[#0f0f0f] to-[#1a1a1a] min-h-screen flex flex-col items-center p-6">
-      {/* Blur Background Glow */}
-      <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-purple-600 opacity-20 rounded-full filter blur-3xl z-0 animate-pulse"></div>
+    <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+      {/* Vertikale Linie als Design-Element */}
+      <div className="fixed h-screen w-px bg-gray-100 left-1/2 -translate-x-1/2 z-0"></div>
       
-      <div className="w-full max-w-4xl bg-[#1e1e1e] border border-gray-700 rounded-xl p-8 shadow-lg text-white mt-10 z-10">
-        <h1 className="text-3xl font-extrabold mb-6 text-center">Registrieren</h1>
-        
-        {/* Plan Selection */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Wähle deinen Plan</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Basic Plan */}
-            <div 
-              className={`border ${selectedPlan === 'basic' 
-                ? 'border-purple-500 bg-[#2a2a2a]' 
-                : 'border-gray-700 bg-[#1e1e1e]'} 
-                rounded-lg p-4 cursor-pointer hover:bg-[#2a2a2a] transition`}
-              onClick={() => setSelectedPlan('basic')}
-            >
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-lg font-semibold">Basic</h3>
-                <span className="text-sm bg-gray-800 px-2 py-1 rounded">19,99€</span>
-              </div>
-              <ul className="text-sm text-gray-300 space-y-1">
-                <li>✓ 1 aktiver Trade</li>
-                <li>✓ Standard KI-Modell</li>
-                <li>✓ Basis-Dashboard</li>
-              </ul>
-              {selectedPlan === 'basic' && (
-                <div className="mt-3 text-xs text-center text-white py-1 rounded">
-                  Aktuell ausgewählt
-                </div>
-              )}
-            </div>
-            
-            {/* Pro Plan */}
-            <div 
-              className={`border ${selectedPlan === 'pro' 
-                ? 'border-purple-500 bg-gradient-to-br from-purple-700/40 to-pink-600/40' 
-                : 'border-gray-700 bg-[#1e1e1e]'} 
-                rounded-lg p-4 cursor-pointer hover:bg-[#2a2a2a] transition relative`}
-              onClick={() => setSelectedPlan('pro')}
-            >
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center">
-                  <h3 className="text-lg font-semibold">Pro</h3>
-                  <span className="ml-2 text-xs bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-0.5 rounded">
-                    Meist gewählt
-                  </span>
-                </div>
-                <span className="text-sm bg-gray-800 px-2 py-1 rounded">34,99€</span>
-              </div>
-              <ul className="text-sm text-gray-300 space-y-1">
-                <li>✓ Bis zu 3 Trades gleichzeitig</li>
-                <li>✓ KI mit höherer Präzision</li>
-                <li>✓ Performance Analytics</li>
-              </ul>
-              {selectedPlan === 'pro' && (
-                <div className="mt-3 text-xs text-center text-white py-1 rounded">
-                  Aktuell ausgewählt
-                </div>
-              )}
-            </div>
-            
-            {/* Deluxe Plan */}
-            <div 
-              className={`border ${selectedPlan === 'deluxe' 
-                ? 'border-purple-500 bg-[#2a2a2a]' 
-                : 'border-gray-700 bg-[#1e1e1e]'} 
-                rounded-lg p-4 cursor-pointer hover:bg-[#2a2a2a] transition`}
-              onClick={() => setSelectedPlan('deluxe')}
-            >
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-lg font-semibold">Deluxe</h3>
-                <span className="text-sm bg-gray-800 px-2 py-1 rounded">49,99€</span>
-              </div>
-              <ul className="text-sm text-gray-300 space-y-1">
-                <li>✓ Unlimitierte Trades</li>
-                <li>✓ Custom KI-Strategien</li>
-                <li>✓ Priorisierter Support</li>
-              </ul>
-              {selectedPlan === 'deluxe' && (
-                <div className="mt-3 text-xs text-center text-white py-1 rounded">
-                  Aktuell ausgewählt
-                </div>
-              )}
-            </div>
-          </div>
+      {/* Header mit Logo und ThemeToggle */}
+      <header className="py-8 text-center relative z-10">
+        <div className="flex items-center justify-center">
+          <Image 
+            src="/stratify-logo-transparent-schwarz.png" 
+            alt="Stratify Logo" 
+            width={40} 
+            height={40}
+            className="mr-2"
+          />
+          <span className="text-sm font-light text-red-500 tracking-widest uppercase ml-1">Stratify</span>
         </div>
-        
-        {/* Registration Form */}
-        <form 
-          onSubmit={(e) => {
-            e.preventDefault();
-            // Hier würde die Registrierungslogik implementiert werden
-            router.push('/depot');
-          }}
-          className="space-y-4"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block mb-1 font-semibold">Vorname</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 rounded bg-[#2a2a2a] outline-none focus:ring-2 focus:ring-purple-600"
-                required
-              />
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
+      </header>
+      
+      {/* Register Form */}
+      <div className="flex-grow flex items-center justify-center px-6 relative z-10">
+        <div className="w-full max-w-3xl">
+          <h1 className="text-3xl font-serif mb-8 text-center">Registrieren</h1>
+          
+          {/* Plan Selection */}
+          <div className="mb-16">
+            <h2 className="text-xl font-serif mb-6 text-center">Wählen Sie Ihren Plan</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {Object.entries(plans).map(([planId, plan]) => (
+                <div 
+                  key={planId}
+                  className={`relative border-t pt-6 cursor-pointer transition-colors
+                    ${selectedPlan === planId ? 'border-red-500' : 'border-gray-100'}
+                    ${plan.recommended ? 'pb-10' : 'pb-6'}
+                  `}
+                  onClick={() => setSelectedPlan(planId)}
+                >
+                  {plan.recommended && (
+                    <div className="absolute -top-3 right-0 bg-red-500 text-white text-xs py-1 px-3 font-light tracking-wider">
+                      EMPFOHLEN
+                    </div>
+                  )}
+                  
+                  <h3 className="text-xl font-serif mb-2">
+                    {plan.name}
+                  </h3>
+                  
+                  <p className="text-2xl font-serif mb-4">{plan.price}</p>
+                  
+                  <ul className="space-y-2 mb-6 text-sm font-light">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-center">
+                        <span className="text-red-500 mr-2">—</span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <div 
+                    className={`absolute bottom-0 left-0 h-1 transition-all duration-300
+                      ${selectedPlan === planId ? 'bg-red-500 w-full' : 'bg-transparent w-0'}
+                    `}
+                  />
+                </div>
+              ))}
             </div>
-            <div>
-              <label className="block mb-1 font-semibold">Nachname</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 rounded bg-[#2a2a2a] outline-none focus:ring-2 focus:ring-purple-600"
-                required
-              />
+          </div>
+          
+          {/* Personal Information */}
+          <div className="w-full max-w-md mx-auto">
+            <h2 className="text-xl font-serif mb-6 text-center">Persönliche Informationen</h2>
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-light text-gray-600 mb-2">Vorname</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
+                      darkMode 
+                        ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                        : 'bg-white text-gray-900 border-gray-300 placeholder-gray-400'
+                    }`}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-light text-gray-600 mb-2">Nachname</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
+                      darkMode 
+                        ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                        : 'bg-white text-gray-900 border-gray-300 placeholder-gray-400'
+                    }`}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-light text-gray-600 mb-2">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                      : 'bg-white text-gray-900 border-gray-300 placeholder-gray-400'
+                  }`}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-light text-gray-600 mb-2">Passwort</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                      : 'bg-white text-gray-900 border-gray-300 placeholder-gray-400'
+                  }`}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-light text-gray-600 mb-2">Passwort bestätigen</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                      : 'bg-white text-gray-900 border-gray-300 placeholder-gray-400'
+                  }`}
+                  required
+                />
+              </div>
+              
+              <div className="pt-6">
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-white border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors duration-300 font-light tracking-wide"
+                >
+                  KONTO ERSTELLEN MIT {plans[selectedPlan as keyof typeof plans].name.toUpperCase()}
+                </button>
+              </div>
+            </form>
+            
+            <div className="mt-8 text-center text-sm text-gray-600 font-light">
+              <p>
+                Bereits registriert?{' '}
+                <Link href="/auth/login" className="text-red-500 hover:underline">
+                  Anmelden
+                </Link>
+              </p>
             </div>
           </div>
-          
-          <div>
-            <label className="block mb-1 font-semibold">E-Mail</label>
-            <input
-              type="email"
-              className="w-full px-3 py-2 rounded bg-[#2a2a2a] outline-none focus:ring-2 focus:ring-purple-600"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block mb-1 font-semibold">Passwort</label>
-            <input
-              type="password"
-              className="w-full px-3 py-2 rounded bg-[#2a2a2a] outline-none focus:ring-2 focus:ring-purple-600"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block mb-1 font-semibold">Passwort bestätigen</label>
-            <input
-              type="password"
-              className="w-full px-3 py-2 rounded bg-[#2a2a2a] outline-none focus:ring-2 focus:ring-purple-600"
-              required
-            />
-          </div>
-          
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="terms"
-              className="mr-2"
-              required
-            />
-            <label htmlFor="terms" className="text-sm text-gray-300">
-              Ich akzeptiere die <a href="#" className="text-purple-400 hover:underline">AGB</a> und <a href="#" className="text-purple-400 hover:underline">Datenschutzbestimmungen</a>
-            </label>
-          </div>
-          
-          <button
-            type="submit"
-            className="w-full py-3 mt-4 rounded bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 font-semibold transition transform hover:scale-105"
-          >
-            Konto erstellen
-          </button>
-        </form>
-        
-        <div className="mt-6 text-center">
-          <p className="text-gray-400">
-            Bereits registriert? {' '}
-            <button
-              onClick={() => router.push('/auth/login')}
-              className="text-purple-400 hover:underline"
-            >
-              Hier einloggen
-            </button>
-          </p>
         </div>
       </div>
+      
+      {/* Verwende die Footer-Komponente anstelle des eingebetteten Footers */}
+      <Footer />
     </main>
   );
 }

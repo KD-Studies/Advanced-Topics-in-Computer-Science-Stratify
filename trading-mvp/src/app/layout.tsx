@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import ClientLayout from '@/components/ClientLayout';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,24 +13,25 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
+// Now this export is allowed since this file doesn't use "use client"
+export const metadata: Metadata = {
   title: 'Stratify - Trading Intelligence',
   description: 'Simplify your strategy, amplify your success',
   icons: {
-    icon: '/stratify-logo.png', // Standard Favicon
-    shortcut: '/stratify-logo.png', // Shortcut Icon
-    apple: '/stratify-logo.png', // Apple Touch Icon
+    icon: '/stratify-logo.png',
+    shortcut: '/stratify-logo.png',
+    apple: '/stratify-logo.png',
   }
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="de" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
+        <ClientLayout>
+          {children}
+        </ClientLayout>
+      </body>
     </html>
   );
 }

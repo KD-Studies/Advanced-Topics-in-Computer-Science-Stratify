@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Line } from 'react-chartjs-2';
 import Navbar from '@/components/Navbar';
-import CryptoSidebar from '@/components/CryptoSidebar'; // Importiere die Sidebar
+import AssetSidebar from '@/components/AssetSidebar'; // AssetSidebar importieren
+import Footer from '@/components/Footer';
+import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,295 +15,573 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { useTheme } from '@/context/ThemeContext'; // Theme-Hook importieren
 
-// Chart.js Setup
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+// Registrieren der benötigten Chart.js Komponenten
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
-const Depot = () => {
+export default function Depot() {
   const router = useRouter();
-  const chartRef = useRef(null);
+  const [activeTimeframe, setActiveTimeframe] = useState('1m');
+  const [activePortfolioTab, setActivePortfolioTab] = useState('gesamt');
+  const { darkMode } = useTheme(); // Dark Mode-Status abrufen
 
-  // Statische Kryptowährungs-Daten
-  const [cryptos] = useState([
-    { name: 'Bitcoin', symbol: 'BTC', amount: 1.2, price: 50000 },
-    { name: 'Ethereum', symbol: 'ETH', amount: 5.3, price: 1800 },
-    { name: 'Litecoin', symbol: 'LTC', amount: 10.8, price: 250 },
-  ]);
-
-  // Statische Aktien-Daten
-  const [stocks] = useState([
-    { name: 'Apple', symbol: 'AAPL', amount: 5, price: 180 },
-    { name: 'Microsoft', symbol: 'MSFT', amount: 3, price: 320 },
-    { name: 'Amazon', symbol: 'AMZN', amount: 2, price: 165 },
-  ]);
-
-  // Für die Sidebar benötigte Daten
-  const cryptoData = {
-    bitcoin: { name: 'Bitcoin', symbol: 'BTC', price: 50000, change24h: 2.5, marketCap: '950B', volume: '32B' },
-    ethereum: { name: 'Ethereum', symbol: 'ETH', price: 1800, change24h: -1.2, marketCap: '225B', volume: '15B' },
-    litecoin: { name: 'Litecoin', symbol: 'LTC', price: 250, change24h: 0.8, marketCap: '15B', volume: '2B' },
-    ripple: { name: 'Ripple', symbol: 'XRP', price: 0.85, change24h: 1.3, marketCap: '41B', volume: '3B' },
-    cardano: { name: 'Cardano', symbol: 'ADA', price: 1.20, change24h: -0.5, marketCap: '38B', volume: '2.5B' },
-    polkadot: { name: 'Polkadot', symbol: 'DOT', price: 15.30, change24h: 3.2, marketCap: '16B', volume: '1.2B' },
-    solana: { name: 'Solana', symbol: 'SOL', price: 120.50, change24h: 5.1, marketCap: '45B', volume: '5B' },
-    dogecoin: { name: 'Dogecoin', symbol: 'DOGE', price: 0.15, change24h: -2.7, marketCap: '20B', volume: '1.8B' },
+  // Assets für die Sidebar definieren
+  const allAssets = {
+    bitcoin: {
+      name: 'Bitcoin',
+      symbol: 'BTC',
+      price: 50000.00,
+      change24h: 2.5,
+      assetType: 'crypto' as 'crypto',
+      marketCap: '950B',
+      volume: '32B'
+    },
+    ethereum: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      price: 1800.00,
+      change24h: -1.2,
+      assetType: 'crypto' as 'crypto',
+      marketCap: '225B',
+      volume: '15B'
+    },
+    cardano: {
+      name: 'Cardano',
+      symbol: 'ADA',
+      price: 1.20,
+      change24h: 4.2,
+      assetType: 'crypto' as 'crypto',
+      marketCap: '38B',
+      volume: '1.5B'
+    },
+    ripple: {
+      name: 'Ripple',
+      symbol: 'XRP',
+      price: 0.85,
+      change24h: -2.4,
+      assetType: 'crypto' as 'crypto',
+      marketCap: '42B',
+      volume: '2.8B'
+    },
+    aapl: {
+      name: 'Apple Inc.',
+      symbol: 'AAPL',
+      price: 182.66,
+      change24h: 1.3,
+      assetType: 'stock' as 'stock',
+      marketCap: '2.9T',
+      sector: 'Technology'
+    },
+    tsla: {
+      name: 'Tesla, Inc.',
+      symbol: 'TSLA',
+      price: 260.52,
+      change24h: -2.1,
+      assetType: 'stock' as 'stock',
+      marketCap: '827B',
+      sector: 'Automotive'
+    },
+    msft: {
+      name: 'Microsoft Corp.',
+      symbol: 'MSFT',
+      price: 334.15,
+      change24h: 1.7,
+      assetType: 'stock' as 'stock',
+      marketCap: '2.5T',
+      sector: 'Technology'
+    },
+    nvda: {
+      name: 'NVIDIA Corp.',
+      symbol: 'NVDA',
+      price: 840.25,
+      change24h: 2.1,
+      assetType: 'stock' as 'stock',
+      marketCap: '2.1T',
+      sector: 'Technology'
+    }
   };
 
-  // Gesamtwerte berechnen
-  const totalCryptoValue = cryptos.reduce((acc, crypto) => acc + crypto.amount * crypto.price, 0);
-  const totalStocksValue = stocks.reduce((acc, stock) => acc + stock.amount * stock.price, 0);
-  const totalWealth = totalCryptoValue + totalStocksValue;
-
-  // Chart-Daten für beide Vermögensklassen
-  const [chartData] = useState({
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
-    datasets: [
-      {
-        label: 'Gesamt',
-        data: [12000, 12800, 13400, 12200, 13100, 14500, 15200, 16100, 16800, 17500, 18200, totalWealth],
-        borderColor: 'rgba(147, 51, 234, 1)', // Lila
-        backgroundColor: 'rgba(147, 51, 234, 0.1)',
-        tension: 0.3,
+  const portfolioData = {
+    gesamt: {
+      totalValue: 10780,
+      '1w': {
+        change: 2.3,
+        labels: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
+        data: [10000, 10050, 10200, 10120, 10230],
       },
-      {
-        label: 'Krypto',
-        data: [10000, 10400, 10800, 9600, 10200, 11000, 11500, 12000, 12500, 13000, 13500, totalCryptoValue],
-        borderColor: 'rgba(56, 189, 248, 1)', // Blau
-        backgroundColor: 'rgba(56, 189, 248, 0.1)',
-        tension: 0.3,
+      '1m': {
+        change: 4.8,
+        labels: Array.from({ length: 30 }, (_, i) => `${i+1}`),
+        data: [
+          10000, 10035, 10110, 10095, 10150, 10220, 10180, 10250, 10290, 10275,
+          10310, 10290, 10350, 10420, 10395, 10450, 10510, 10490, 10530, 10590,
+          10550, 10590, 10650, 10630, 10670, 10710, 10690, 10730, 10770, 10780, 
+        ],
       },
-      {
-        label: 'Aktien',
-        data: [2000, 2400, 2600, 2600, 2900, 3500, 3700, 4100, 4300, 4500, 4700, totalStocksValue],
-        borderColor: 'rgba(74, 222, 128, 1)', // Grün
-        backgroundColor: 'rgba(74, 222, 128, 0.1)',
-        tension: 0.3,
+      '3m': {
+        change: 8.2,
+        labels: Array.from({ length: 12 }, (_, i) => `W${i+1}`),
+        data: [
+          10000, 10120, 10250, 10190, 10320, 10410, 10380, 10560, 10640, 10590, 10730, 10820
+        ],
       },
-    ],
-  });
-
-  const [activeTab, setActiveTab] = useState('crypto'); // 'crypto' oder 'stocks'
-  const [chartTab, setChartTab] = useState('all'); // 'all', 'crypto', oder 'stocks'
-
+    },
+    krypto: {
+      totalValue: 5830,
+      '1w': {
+        change: 3.1,
+        labels: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
+        data: [5500, 5580, 5650, 5600, 5680],
+      },
+      '1m': {
+        change: 6.0,
+        labels: Array.from({ length: 30 }, (_, i) => `${i+1}`),
+        data: [
+          5500, 5520, 5570, 5550, 5590, 5640, 5610, 5660, 5680, 5670,
+          5690, 5680, 5710, 5750, 5730, 5760, 5790, 5780, 5810, 5830,
+          5810, 5820, 5840, 5830, 5850, 5870, 5860, 5880, 5900, 5830,
+        ],
+      },
+      '3m': {
+        change: 10.5,
+        labels: Array.from({ length: 12 }, (_, i) => `W${i+1}`),
+        data: [
+          5300, 5370, 5420, 5390, 5450, 5490, 5470, 5560, 5600, 5580, 5680, 5830
+        ],
+      },
+    },
+    aktien: {
+      totalValue: 4950,
+      '1w': {
+        change: 1.4,
+        labels: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
+        data: [4800, 4830, 4870, 4850, 4880],
+      },
+      '1m': {
+        change: 3.1,
+        labels: Array.from({ length: 30 }, (_, i) => `${i+1}`),
+        data: [
+          4800, 4815, 4840, 4830, 4855, 4875, 4860, 4885, 4900, 4890,
+          4910, 4900, 4920, 4935, 4925, 4940, 4955, 4945, 4960, 4980,
+          4970, 4985, 5000, 4990, 5005, 5020, 5010, 5025, 5040, 4950,
+        ],
+      },
+      '3m': {
+        change: 5.3,
+        labels: Array.from({ length: 12 }, (_, i) => `W${i+1}`),
+        data: [
+          4700, 4750, 4800, 4780, 4830, 4860, 4840, 4890, 4920, 4900, 4940, 4950
+        ],
+      },
+    }
+  };
+  
+  type TimeframeKey = '1w' | '1m' | '3m';
+  const currentPortfolioData = portfolioData[activePortfolioTab as keyof typeof portfolioData];
+  const currentPerformance = currentPortfolioData[activeTimeframe as TimeframeKey];
+  
+  const allPositions = [
+    {
+      id: 'bitcoin-long',
+      asset: 'Bitcoin',
+      symbol: 'BTC',
+      type: 'long',
+      openPrice: 45320,
+      currentPrice: 50000,
+      pnl: 10.33,
+      date: '05.03.2025',
+      amount: '$3,500.00',
+      assetType: 'krypto',
+    },
+    {
+      id: 'ethereum-long',
+      asset: 'Ethereum',
+      symbol: 'ETH',
+      type: 'long',
+      openPrice: 1700.80,
+      currentPrice: 1800.00,
+      pnl: 5.83,
+      date: '01.04.2025',
+      amount: '$2,330.00',
+      assetType: 'krypto',
+    },
+    {
+      id: 'tesla-short',
+      asset: 'Tesla',
+      symbol: 'TSLA',
+      type: 'short',
+      openPrice: 280.50,
+      currentPrice: 260.50,
+      pnl: 7.13,
+      date: '23.03.2025',
+      amount: '$2,800.00',
+      assetType: 'aktien',
+    },
+    {
+      id: 'apple-long',
+      asset: 'Apple',
+      symbol: 'AAPL',
+      type: 'long',
+      openPrice: 175.20,
+      currentPrice: 182.60,
+      pnl: 4.22,
+      date: '15.03.2025',
+      amount: '$2,150.00',
+      assetType: 'aktien',
+    },
+  ];
+  
+  const filteredPositions = activePortfolioTab === 'gesamt' 
+    ? allPositions 
+    : allPositions.filter(position => position.assetType === activePortfolioTab);
+  
+  const recommendations = [
+    {
+      id: 'crypto-1',
+      asset: 'Cardano',
+      symbol: 'ADA',
+      price: 1.20,
+      change: 4.2,
+      action: 'long',
+      reliability: 87,
+      assetType: 'krypto',
+    },
+    {
+      id: 'stock-1',
+      asset: 'NVIDIA',
+      symbol: 'NVDA',
+      price: 840.25,
+      change: 2.1,
+      action: 'long',
+      reliability: 83,
+      assetType: 'aktien',
+    },
+    {
+      id: 'crypto-2',
+      asset: 'Ripple',
+      symbol: 'XRP',
+      price: 0.85,
+      change: -2.4,
+      action: 'short',
+      reliability: 79,
+      assetType: 'krypto',
+    },
+    {
+      id: 'stock-2',
+      asset: 'Microsoft',
+      symbol: 'MSFT',
+      price: 334.15,
+      change: 1.7,
+      action: 'long',
+      reliability: 81,
+      assetType: 'aktien',
+    },
+  ];
+  
+  const filteredRecommendations = activePortfolioTab === 'gesamt' 
+    ? recommendations 
+    : recommendations.filter(rec => rec.assetType === activePortfolioTab);
+  
   return (
-    <main className="bg-gradient-to-br from-[#0f0f0f] to-[#1a1a1a] text-white min-h-screen">
+    <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
       <Navbar username="John Doe" />
       
-      <div className="flex">
-        {/* Sidebar hinzufügen */}
-        <CryptoSidebar cryptoData={cryptoData} activeCryptoId="" />
-
-        {/* Main Content - bestehender Inhalt mit angepasstem Layout */}
-        <div className="w-full md:pl-64">
-          <div className="px-6 py-12">
-            {/* Blur Background Glow */}
-            <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-purple-600 opacity-20 rounded-full filter blur-3xl z-0 animate-pulse"></div>
-
-            {/* Depot Overview */}
-            <div className="z-10 max-w-4xl text-center mx-auto mb-24">
-              <h2 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
-                  Dein Depot
-                </span>{' '}
-                Überblick
-              </h2>
-              <p className="text-lg md:text-xl text-gray-300 mb-10">
-                Dein aktuelles Vermögen: <span className="font-semibold">{totalWealth.toFixed(2)} €</span>
-              </p>
-            </div>
-
-            {/* Chart Section mit Tabs */}
-            <div className="mb-10 z-10 max-w-6xl mx-auto">
-              {/* Tab Navigation für Chart */}
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">Vermögensentwicklung</h3>
-                <div className="bg-gray-900 rounded-lg p-1">
-                  <button 
-                    className={`px-4 py-2 text-sm rounded-lg transition ${
-                      chartTab === 'all' 
-                        ? 'bg-purple-600 text-white' 
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                    onClick={() => setChartTab('all')}
-                  >
-                    Gesamt
-                  </button>
-                  <button 
-                    className={`px-4 py-2 text-sm rounded-lg transition ${
-                      chartTab === 'crypto' 
-                        ? 'bg-purple-600 text-white' 
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                    onClick={() => setChartTab('crypto')}
-                  >
-                    Krypto
-                  </button>
-                  <button 
-                    className={`px-4 py-2 text-sm rounded-lg transition ${
-                      chartTab === 'stocks' 
-                        ? 'bg-purple-600 text-white' 
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                    onClick={() => setChartTab('stocks')}
-                  >
-                    Aktien
-                  </button>
+      {/* AssetSidebar hinzufügen */}
+      <AssetSidebar 
+        assets={allAssets} 
+        activeAssetId="" // Kein aktives Asset auf der Depot-Seite
+      />
+      
+      {/* Hauptcontainer mit Abstand zur Sidebar auf Desktop */}
+      <div className="ml-0 md:ml-64 flex-grow w-full transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="mb-12">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end">
+              <div>
+                <h1 className="text-4xl font-serif mb-2">Mein Portfolio</h1>
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} font-light transition-colors duration-300`}>
+                  Dashboard mit allen Aktivitäten und Kennzahlen
+                </p>
+              </div>
+              <div>
+                <div className="text-lg text-right">
+                  <span className="text-3xl font-serif">${currentPortfolioData.totalValue.toLocaleString()}</span>
+                  <span className={`ml-2 text-sm ${currentPerformance.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {currentPerformance.change >= 0 ? '+' : ''}{currentPerformance.change}%
+                  </span>
                 </div>
-              </div>
-              
-              <div className="bg-gray-800 p-6 rounded-xl shadow-lg" style={{ height: "300px" }}>
-                <Line 
-                  ref={chartRef} 
-                  data={{
-                    labels: chartData.labels,
-                    datasets: chartTab === 'all' 
-                      ? chartData.datasets 
-                      : chartTab === 'crypto'
-                        ? [chartData.datasets[1]] // Nur Krypto-Daten
-                        : [chartData.datasets[2]] // Nur Aktien-Daten
-                  }} 
-                  options={{ 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    scales: {
-                      y: {
-                        beginAtZero: false,
-                        grid: {
-                          color: 'rgba(255, 255, 255, 0.1)',
-                        },
-                        ticks: {
-                          color: '#888',
-                        }
-                      },
-                      x: {
-                        grid: {
-                          color: 'rgba(255, 255, 255, 0.1)',
-                        },
-                        ticks: {
-                          color: '#888',
-                        }
-                      },
-                    },
-                    plugins: {
-                      legend: {
-                        display: chartTab === 'all',
-                        position: 'top',
-                        labels: {
-                          color: '#fff',
-                          font: {
-                            size: 12
-                          }
-                        }
-                      },
-                      tooltip: {
-                        backgroundColor: '#1e1e1e',
-                        titleColor: '#fff',
-                        bodyColor: '#fff',
-                        borderColor: '#444',
-                        borderWidth: 1,
-                      }
-                    }
-                  }} 
-                />
-              </div>
-            </div>
-
-            {/* Asset-Liste mit Tabs */}
-            <div className="z-10 max-w-6xl mx-auto">
-              {/* Tab Navigation */}
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">Deine Anlagen</h3>
-                <div className="bg-gray-900 rounded-lg p-1">
-                  <button 
-                    className={`px-4 py-2 text-sm rounded-lg transition ${
-                      activeTab === 'crypto' 
-                        ? 'bg-purple-600 text-white' 
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                    onClick={() => setActiveTab('crypto')}
-                  >
-                    Kryptowährungen
-                  </button>
-                  <button 
-                    className={`px-4 py-2 text-sm rounded-lg transition ${
-                      activeTab === 'stocks' 
-                        ? 'bg-purple-600 text-white' 
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                    onClick={() => setActiveTab('stocks')}
-                  >
-                    Aktien
-                  </button>
-                </div>
-              </div>
-              
-              <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
-                {activeTab === 'crypto' ? (
-                  <>
-                    <div className="flex justify-between items-center mb-3">
-                      <p className="text-sm text-gray-400">Gesamtwert: {totalCryptoValue.toFixed(2)} €</p>
-                      <button className="text-xs text-purple-400 hover:text-purple-300">
-                        Neue Krypto hinzufügen
-                      </button>
-                    </div>
-                    <table className="w-full text-sm text-left text-gray-300">
-                      <thead className="text-xs uppercase bg-gray-700">
-                        <tr>
-                          <th className="px-6 py-3">Krypto</th>
-                          <th className="px-6 py-3">Menge</th>
-                          <th className="px-6 py-3">Preis pro Einheit (€)</th>
-                          <th className="px-6 py-3">Gesamtwert (€)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {cryptos.map((crypto, idx) => (
-                          <tr key={idx} className="border-b border-gray-700">
-                            <td className="px-6 py-4">{crypto.name} ({crypto.symbol})</td>
-                            <td className="px-6 py-4">{crypto.amount}</td>
-                            <td className="px-6 py-4">{crypto.price.toFixed(2)}</td>
-                            <td className="px-6 py-4">{(crypto.amount * crypto.price).toFixed(2)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex justify-between items-center mb-3">
-                      <p className="text-sm text-gray-400">Gesamtwert: {totalStocksValue.toFixed(2)} €</p>
-                      <button className="text-xs text-purple-400 hover:text-purple-300">
-                        Neue Aktie hinzufügen
-                      </button>
-                    </div>
-                    <table className="w-full text-sm text-left text-gray-300">
-                      <thead className="text-xs uppercase bg-gray-700">
-                        <tr>
-                          <th className="px-6 py-3">Aktie</th>
-                          <th className="px-6 py-3">Anzahl</th>
-                          <th className="px-6 py-3">Kurs (€)</th>
-                          <th className="px-6 py-3">Gesamtwert (€)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {stocks.map((stock, idx) => (
-                          <tr key={idx} className="border-b border-gray-700">
-                            <td className="px-6 py-4">{stock.name} ({stock.symbol})</td>
-                            <td className="px-6 py-4">{stock.amount}</td>
-                            <td className="px-6 py-4">{stock.price.toFixed(2)}</td>
-                            <td className="px-6 py-4">{(stock.amount * stock.price).toFixed(2)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </>
-                )}
+                <p className="text-right text-sm text-gray-500 font-light">
+                  {activePortfolioTab === 'gesamt' ? 'Gesamtwert' : 
+                   activePortfolioTab === 'krypto' ? 'Krypto-Wert' : 'Aktien-Wert'}
+                </p>
               </div>
             </div>
           </div>
+          
+          <div className={`mb-8 border-b ${darkMode ? 'border-gray-800' : 'border-gray-100'} transition-colors duration-300`}>
+            <div className="flex space-x-8">
+              <button
+                onClick={() => setActivePortfolioTab('gesamt')}
+                className={`pb-4 text-sm font-light ${
+                  activePortfolioTab === 'gesamt' 
+                    ? 'border-b border-red-500 text-red-500' 
+                    : darkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}
+              >
+                Gesamt
+              </button>
+              <button
+                onClick={() => setActivePortfolioTab('krypto')}
+                className={`pb-4 text-sm font-light ${
+                  activePortfolioTab === 'krypto' 
+                    ? 'border-b border-red-500 text-red-500' 
+                    : darkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}
+              >
+                Krypto
+              </button>
+              <button
+                onClick={() => setActivePortfolioTab('aktien')}
+                className={`pb-4 text-sm font-light ${
+                  activePortfolioTab === 'aktien' 
+                    ? 'border-b border-red-500 text-red-500' 
+                    : darkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}
+              >
+                Aktien
+              </button>
+            </div>
+          </div>
+          
+          <div className="mb-16">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+              <h2 className="text-2xl font-serif">Performance</h2>
+              
+              <div className="flex mt-4 md:mt-0 space-x-4">
+                <button 
+                  onClick={() => setActiveTimeframe('1w')} 
+                  className={`text-sm ${activeTimeframe === '1w' ? 'text-red-500 border-b border-red-500' : darkMode ? 'text-gray-400' : 'text-gray-500'} pb-1`}
+                >
+                  1W
+                </button>
+                <button 
+                  onClick={() => setActiveTimeframe('1m')} 
+                  className={`text-sm ${activeTimeframe === '1m' ? 'text-red-500 border-b border-red-500' : darkMode ? 'text-gray-400' : 'text-gray-500'} pb-1`}
+                >
+                  1M
+                </button>
+                <button 
+                  onClick={() => setActiveTimeframe('3m')} 
+                  className={`text-sm ${activeTimeframe === '3m' ? 'text-red-500 border-b border-red-500' : darkMode ? 'text-gray-400' : 'text-gray-500'} pb-1`}
+                >
+                  3M
+                </button>
+              </div>
+            </div>
+            
+            <div className="chart-container mb-8">
+              <div style={{ height: "300px" }}>
+                <Line 
+                  data={{
+                    labels: currentPerformance.labels,
+                    datasets: [
+                      {
+                        label: 'Portfolio Wert',
+                        data: currentPerformance.data,
+                        borderColor: '#c81e1e',
+                        backgroundColor: 'rgba(200, 30, 30, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                      }
+                    ]
+                  }} 
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                      tooltip: {
+                        backgroundColor: darkMode ? '#333' : 'white',
+                        titleColor: darkMode ? '#fff' : '#1a1a1a',
+                        bodyColor: darkMode ? '#ddd' : '#555555',
+                        borderColor: darkMode ? '#555' : '#e5e5e5',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                          label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                              label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                              label += new Intl.NumberFormat('de-DE', { 
+                                style: 'currency', 
+                                currency: 'USD' 
+                              }).format(context.parsed.y);
+                            }
+                            return label;
+                          }
+                        }
+                      }
+                    },
+                    scales: {
+                      x: {
+                        grid: { color: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.03)' },
+                        ticks: { 
+                          color: darkMode ? '#aaa' : '#888',
+                          font: { family: "'Inter', sans-serif", size: 10 }
+                        },
+                      },
+                      y: {
+                        grid: { color: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.03)' },
+                        ticks: {
+                          color: darkMode ? '#aaa' : '#888',
+                          font: { family: "'Inter', sans-serif", size: 10 },
+                          callback: function(value) {
+                            return '$' + value.toLocaleString();
+                          }
+                        },
+                      }
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="mb-16">
+            <h2 className="text-2xl font-serif mb-8">
+              {activePortfolioTab === 'gesamt' ? 'Aktive Positionen' : 
+               activePortfolioTab === 'krypto' ? 'Krypto-Positionen' : 'Aktien-Positionen'}
+            </h2>
+            
+            {filteredPositions.length > 0 ? (
+              <div className="overflow-auto mb-6">
+                <table className="w-full">
+                  <thead>
+                    <tr className={`border-b ${darkMode ? 'border-gray-800' : 'border-gray-100'}`}>
+                      <th className={`py-3 text-left font-serif font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm`}>Asset</th>
+                      <th className={`py-3 text-left font-serif font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm`}>Position</th>
+                      <th className={`py-3 text-right font-serif font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm`}>Einkauf</th>
+                      <th className={`py-3 text-right font-serif font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm`}>Aktuell</th>
+                      <th className={`py-3 text-right font-serif font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm`}>P&L</th>
+                      <th className={`py-3 text-right font-serif font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm`}>Datum</th>
+                      <th className={`py-3 text-right font-serif font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm`}>Betrag</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredPositions.map((position) => (
+                      <tr 
+                        key={position.id}
+                        className={`border-b ${darkMode ? 'border-gray-800 hover:bg-gray-800' : 'border-gray-50 hover:bg-gray-50'} cursor-pointer`}
+                        onClick={() => router.push(`/chart/${position.symbol.toLowerCase()}`)}
+                      >
+                        <td className="py-4">
+                          <div className="flex items-start">
+                            <div>
+                              <div className="font-serif">{position.asset}</div>
+                              <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{position.symbol}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4">
+                          <span className={`px-2 py-1 text-xs ${position.type === 'long' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                            {position.type}
+                          </span>
+                        </td>
+                        <td className="py-4 text-right font-light">
+                          ${position.openPrice.toLocaleString()}
+                        </td>
+                        <td className="py-4 text-right font-light">
+                          ${position.currentPrice.toLocaleString()}
+                        </td>
+                        <td className="py-4 text-right">
+                          <span className={position.pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
+                            {position.pnl >= 0 ? '+' : ''}{position.pnl}%
+                          </span>
+                        </td>
+                        <td className="py-4 text-right font-light">
+                          {position.date}
+                        </td>
+                        <td className="py-4 text-right font-light">
+                          {position.amount}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'} font-light`}>
+                Keine aktiven Positionen in dieser Kategorie.
+              </p>
+            )}
+          </div>
+          
+          <div className="mb-16">
+            <h2 className="text-2xl font-serif mb-8">
+              {activePortfolioTab === 'gesamt' ? 'Empfehlungen' : 
+               activePortfolioTab === 'krypto' ? 'Krypto-Empfehlungen' : 'Aktien-Empfehlungen'}
+            </h2>
+            
+            {filteredRecommendations.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {filteredRecommendations.map((rec) => (
+                  <div 
+                    key={rec.id} 
+                    className={`border-t ${darkMode ? 'border-gray-800 hover:border-red-400' : 'border-gray-100 hover:border-red-400'} pt-6 cursor-pointer transition-colors`}
+                    onClick={() => router.push(`/chart/${rec.id}`)}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <div className="flex items-baseline space-x-2">
+                          <h3 className="text-xl font-serif">{rec.asset}</h3>
+                          <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{rec.symbol}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <span className={`px-2 py-1 text-xs ${rec.action === 'long' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                          {rec.action}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="text-lg">${rec.price.toLocaleString()}</div>
+                        <div className={`text-xs ${rec.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {rec.change >= 0 ? '+' : ''}{rec.change}%
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-1`}>Verlässlichkeit</div>
+                        <div className="text-sm font-medium">{rec.reliability}%</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'} font-light`}>
+                Keine Empfehlungen in dieser Kategorie.
+              </p>
+            )}
+          </div>
         </div>
       </div>
+      
+      <Footer compact={true} />
     </main>
   );
-};
-
-export default Depot;
+}
