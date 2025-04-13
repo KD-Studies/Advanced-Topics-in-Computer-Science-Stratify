@@ -42,7 +42,7 @@ export default function Home() {
           </ul>
           <button
             className="w-full bg-gray-800 text-white py-2 rounded hover:bg-gray-700 transition"
-            onClick={() => router.push('/auth/login')}
+            onClick={() => router.push('/auth/register?plan=basic')}
           >
             Wählen
           </button>
@@ -60,7 +60,7 @@ export default function Home() {
           </ul>
           <button
             className="w-full bg-white text-black py-2 rounded hover:bg-gray-200 transition font-semibold"
-            onClick={() => router.push('/auth/login')}
+            onClick={() => router.push('/auth/register?plan=pro')}
           >
             Meist gewählt
           </button>
@@ -78,7 +78,7 @@ export default function Home() {
           </ul>
           <button
             className="w-full bg-gray-800 text-white py-2 rounded hover:bg-gray-700 transition"
-            onClick={() => router.push('/auth/login')}
+            onClick={() => router.push('/auth/register?plan=deluxe')}
           >
             Wählen
           </button>

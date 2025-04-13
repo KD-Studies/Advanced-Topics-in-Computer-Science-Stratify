@@ -29,6 +29,12 @@ const Navbar = ({ username = 'Demo User' }: NavbarProps) => {
               >
                 Chartsuche
               </button>
+              <button 
+                onClick={() => router.push('/backtest')} 
+                className="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-gray-700"
+              >
+                Backtesting
+              </button>
             </div>
           </div>
           <div className="flex items-center">

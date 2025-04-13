@@ -15,7 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: 'Stratify - Trading Intelligence',
   description: 'Simplify your strategy, amplify your success',
-  // Weitere Metadaten hier...
+  icons: {
+    icon: '/stratify-logo.png', // Standard Favicon
+    shortcut: '/stratify-logo.png', // Shortcut Icon
+    apple: '/stratify-logo.png', // Apple Touch Icon
+  }
 };
 
 export default function RootLayout({
