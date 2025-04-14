@@ -292,7 +292,7 @@ export default function Depot() {
     : recommendations.filter(rec => rec.assetType === activePortfolioTab);
   
   return (
-    <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
+    <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-stone-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
       <Navbar username="John Doe" />
       
       {/* AssetSidebar hinzufügen */}
@@ -308,7 +308,7 @@ export default function Depot() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end">
               <div>
                 <h1 className="text-4xl font-serif mb-2">Mein Portfolio</h1>
-                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} font-light transition-colors duration-300`}>
+                <p className={`${darkMode ? 'text-stone-400' : 'text-gray-600'} font-light transition-colors duration-300`}>
                   Dashboard mit allen Aktivitäten und Kennzahlen
                 </p>
               </div>
@@ -388,75 +388,77 @@ export default function Depot() {
               </div>
             </div>
             
-            <div className="chart-container mb-8">
-              <div style={{ height: "300px" }}>
-                <Line 
-                  data={{
-                    labels: currentPerformance.labels,
-                    datasets: [
-                      {
-                        label: 'Portfolio Wert',
-                        data: currentPerformance.data,
-                        borderColor: '#c81e1e',
-                        backgroundColor: 'rgba(200, 30, 30, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                      }
-                    ]
-                  }} 
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                      legend: {
-                        display: false,
-                      },
-                      tooltip: {
-                        backgroundColor: darkMode ? '#333' : 'white',
-                        titleColor: darkMode ? '#fff' : '#1a1a1a',
-                        bodyColor: darkMode ? '#ddd' : '#555555',
-                        borderColor: darkMode ? '#555' : '#e5e5e5',
-                        borderWidth: 1,
-                        padding: 12,
-                        callbacks: {
-                          label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                              label += ': ';
-                            }
-                            if (context.parsed.y !== null) {
-                              label += new Intl.NumberFormat('de-DE', { 
-                                style: 'currency', 
-                                currency: 'USD' 
-                              }).format(context.parsed.y);
-                            }
-                            return label;
+            <div 
+              className={`chart-container mb-8 ${darkMode ? 'bg-stone-900' : 'bg-white'}`} 
+              style={{ height: "300px", borderRadius: "4px" }}
+            >
+              <Line 
+                data={{
+                  labels: currentPerformance.labels,
+                  datasets: [
+                    {
+                      label: 'Portfolio Wert',
+                      data: currentPerformance.data,
+                      borderColor: '#c81e1e',
+                      backgroundColor: darkMode ? 'rgba(200, 30, 30, 0.1)' : 'rgba(200, 30, 30, 0.1)', // Dies ist für die Linienfüllung
+                      tension: 0.4,
+                      fill: true,
+                    }
+                  ]
+                }} 
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  backgroundColor: darkMode ? '#1a1a18' : '#fff', // Hier wird der Chart-Hintergrund gesetzt
+                  plugins: {
+                    legend: {
+                      display: false,
+                    },
+                    tooltip: {
+                      backgroundColor: darkMode ? '#333' : 'white',
+                      titleColor: darkMode ? '#fff' : '#1a1a1a',
+                      bodyColor: darkMode ? '#ddd' : '#555555',
+                      borderColor: darkMode ? '#555' : '#e5e5e5',
+                      borderWidth: 1,
+                      padding: 12,
+                      callbacks: {
+                        label: function(context) {
+                          let label = context.dataset.label || '';
+                          if (label) {
+                            label += ': ';
                           }
+                          if (context.parsed.y !== null) {
+                            label += new Intl.NumberFormat('de-DE', { 
+                              style: 'currency', 
+                              currency: 'USD' 
+                            }).format(context.parsed.y);
+                          }
+                          return label;
                         }
                       }
-                    },
-                    scales: {
-                      x: {
-                        grid: { color: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.03)' },
-                        ticks: { 
-                          color: darkMode ? '#aaa' : '#888',
-                          font: { family: "'Inter', sans-serif", size: 10 }
-                        },
-                      },
-                      y: {
-                        grid: { color: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.03)' },
-                        ticks: {
-                          color: darkMode ? '#aaa' : '#888',
-                          font: { family: "'Inter', sans-serif", size: 10 },
-                          callback: function(value) {
-                            return '$' + value.toLocaleString();
-                          }
-                        },
-                      }
                     }
-                  }}
-                />
-              </div>
+                  },
+                  scales: {
+                    x: {
+                      grid: { color: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.03)' },
+                      ticks: { 
+                        color: darkMode ? '#aaa' : '#888',
+                        font: { family: "'Inter', sans-serif", size: 10 }
+                      },
+                    },
+                    y: {
+                      grid: { color: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.03)' },
+                      ticks: {
+                        color: darkMode ? '#aaa' : '#888',
+                        font: { family: "'Inter', sans-serif", size: 10 },
+                        callback: function(value) {
+                          return '$' + value.toLocaleString();
+                        }
+                      },
+                    }
+                  }
+                }}
+              />
             </div>
           </div>
           

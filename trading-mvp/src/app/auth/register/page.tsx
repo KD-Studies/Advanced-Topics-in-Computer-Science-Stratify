@@ -69,9 +69,9 @@ export default function Register() {
   };
 
   return (
-    <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+    <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-stone-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
       {/* Vertikale Linie als Design-Element */}
-      <div className="fixed h-screen w-px bg-gray-100 left-1/2 -translate-x-1/2 z-0"></div>
+      <div className={`fixed h-screen w-px ${darkMode ? 'bg-stone-700' : 'bg-gray-100'} left-1/2 -translate-x-1/2 z-0 transition-colors duration-300`}></div>
       
       {/* Header mit Logo und ThemeToggle */}
       <header className="py-8 text-center relative z-10">
@@ -104,7 +104,7 @@ export default function Register() {
                 <div 
                   key={planId}
                   className={`relative border-t pt-6 cursor-pointer transition-colors
-                    ${selectedPlan === planId ? 'border-red-500' : 'border-gray-100'}
+                    ${selectedPlan === planId ? 'border-red-500' : darkMode ? 'border-stone-700' : 'border-gray-100'}
                     ${plan.recommended ? 'pb-10' : 'pb-6'}
                   `}
                   onClick={() => setSelectedPlan(planId)}
@@ -155,7 +155,7 @@ export default function Register() {
                     onChange={handleChange}
                     className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
                       darkMode 
-                        ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                        ? 'bg-stone-800 text-white border-stone-700 placeholder-stone-500' 
                         : 'bg-white text-gray-900 border-gray-300 placeholder-gray-400'
                     }`}
                     required
@@ -170,7 +170,7 @@ export default function Register() {
                     onChange={handleChange}
                     className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
                       darkMode 
-                        ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                        ? 'bg-stone-800 text-white border-stone-700 placeholder-stone-500' 
                         : 'bg-white text-gray-900 border-gray-300 placeholder-gray-400'
                     }`}
                     required
@@ -187,7 +187,7 @@ export default function Register() {
                   onChange={handleChange}
                   className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
                     darkMode 
-                      ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                      ? 'bg-stone-800 text-white border-stone-700 placeholder-stone-500' 
                       : 'bg-white text-gray-900 border-gray-300 placeholder-gray-400'
                   }`}
                   required
@@ -203,7 +203,7 @@ export default function Register() {
                   onChange={handleChange}
                   className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
                     darkMode 
-                      ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                      ? 'bg-stone-800 text-white border-stone-700 placeholder-stone-500' 
                       : 'bg-white text-gray-900 border-gray-300 placeholder-gray-400'
                   }`}
                   required
@@ -219,7 +219,7 @@ export default function Register() {
                   onChange={handleChange}
                   className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
                     darkMode 
-                      ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                      ? 'bg-stone-800 text-white border-stone-700 placeholder-stone-500' 
                       : 'bg-white text-gray-900 border-gray-300 placeholder-gray-400'
                   }`}
                   required

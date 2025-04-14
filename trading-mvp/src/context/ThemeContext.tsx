@@ -1,45 +1,55 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type ThemeContextType = {
+interface ThemeContextType {
   darkMode: boolean;
   toggleDarkMode: () => void;
-};
+}
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType>({
+  darkMode: false,
+  toggleDarkMode: () => {},
+});
 
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  // Beim ersten Laden den gespeicherten Theme-Status abrufen oder als Standard hell verwenden
-  const [darkMode, setDarkMode] = useState(false);
+export const useTheme = () => useContext(ThemeContext);
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  // Versuche, den Darkmode-Status aus dem lokalen Speicher zu laden
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Beim Client-seitigen Rendering den gespeicherten Theme-Status abrufen
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    setDarkMode(savedDarkMode);
+    // Code nur auf dem Client ausführen
+    const savedDarkMode = localStorage.getItem('darkMode');
     
-    // HTML-Klasse für globale Theme-Anwendung setzen
-    if (savedDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    // Wenn ein gespeicherter Wert vorhanden ist, verwende ihn
+    if (savedDarkMode !== null) {
+      setDarkMode(savedDarkMode === 'true');
+    } 
+    // Sonst prüfe die Systemeinstellungen
+    else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setDarkMode(prefersDark);
     }
+    
+    setIsInitialized(true);
   }, []);
 
-  const toggleDarkMode = () => {
-    setDarkMode(prev => {
-      const newMode = !prev;
-      // Im localStorage speichern
-      localStorage.setItem('darkMode', String(newMode));
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('darkMode', darkMode.toString());
       
-      // HTML-Klasse aktualisieren
-      if (newMode) {
+      // HTML-Element direkt manipulieren für Tailwind
+      if (darkMode) {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
       }
-      
-      return newMode;
-    });
+    }
+  }, [darkMode, isInitialized]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(prev => !prev);
   };
 
   return (
@@ -47,13 +57,4 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       {children}
     </ThemeContext.Provider>
   );
-};
-
-// Hook für einfachen Zugriff auf den Theme-Context
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
-};
+}

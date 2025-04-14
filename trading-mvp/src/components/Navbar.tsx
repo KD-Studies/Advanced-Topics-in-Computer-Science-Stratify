@@ -213,7 +213,7 @@ const Navbar = ({ username = 'Demo User' }: NavbarProps) => {
   const { darkMode } = useTheme();
 
   return (
-    <nav className={`${darkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-gray-100 text-gray-900'} border-b sticky top-0 z-50 transition-colors duration-300`}>
+    <nav className={`${darkMode ? 'bg-stone-900 border-stone-800 text-white' : 'bg-white border-gray-100 text-gray-900'} border-b sticky top-0 z-50 transition-colors duration-300`}>
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -235,19 +235,19 @@ const Navbar = ({ username = 'Demo User' }: NavbarProps) => {
             <div className="hidden md:flex ml-12 space-x-12">
               <button 
                 onClick={() => router.push('/depot')}
-                className={`text-sm font-light ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
+                className={`text-sm font-light ${darkMode ? 'text-stone-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
               >
                 Portfolio
               </button>
               <button 
                 onClick={() => router.push('/chartsuche')}
-                className={`text-sm font-light ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
+                className={`text-sm font-light ${darkMode ? 'text-stone-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
               >
                 Assetsuche
               </button>
               <button 
                 onClick={() => router.push('/backtest')}
-                className={`text-sm font-light ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
+                className={`text-sm font-light ${darkMode ? 'text-stone-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
               >
                 Strategie
               </button>
@@ -264,7 +264,7 @@ const Navbar = ({ username = 'Demo User' }: NavbarProps) => {
             <div className="relative">
               <button 
                 onClick={() => setMenuOpen(!menuOpen)}
-                className={`flex items-center text-sm font-light ${darkMode ? 'text-gray-300' : 'text-gray-700'} focus:outline-none`}
+                className={`flex items-center text-sm font-light ${darkMode ? 'text-stone-300' : 'text-gray-700'} focus:outline-none`}
               >
                 <span className="mr-2">{username}</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -273,13 +273,13 @@ const Navbar = ({ username = 'Demo User' }: NavbarProps) => {
               </button>
               
               {menuOpen && (
-                <div className={`absolute right-0 mt-2 w-48 py-2 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} border shadow-lg rounded-none z-50`}>
+                <div className={`absolute right-0 mt-2 w-48 py-2 ${darkMode ? 'bg-stone-800 border-stone-700' : 'bg-white border-gray-100'} border shadow-lg rounded-none z-50`}>
                   <button 
                     onClick={() => {
                       setMenuOpen(false);
                       router.push('/profile');
                     }}
-                    className={`block w-full text-left px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                    className={`block w-full text-left px-4 py-2 text-sm ${darkMode ? 'text-stone-300 hover:bg-stone-700' : 'text-gray-700 hover:bg-gray-50'}`}
                   >
                     Profil
                   </button>
@@ -288,7 +288,7 @@ const Navbar = ({ username = 'Demo User' }: NavbarProps) => {
                       setMenuOpen(false);
                       router.push('/settings');
                     }}
-                    className={`block w-full text-left px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                    className={`block w-full text-left px-4 py-2 text-sm ${darkMode ? 'text-stone-300 hover:bg-stone-700' : 'text-gray-700 hover:bg-gray-50'}`}
                   >
                     Einstellungen
                   </button>
@@ -297,7 +297,7 @@ const Navbar = ({ username = 'Demo User' }: NavbarProps) => {
                       setMenuOpen(false);
                       router.push('/auth/login');
                     }}
-                    className={`block w-full text-left px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                    className={`block w-full text-left px-4 py-2 text-sm ${darkMode ? 'text-stone-300 hover:bg-stone-700' : 'text-gray-700 hover:bg-gray-50'}`}
                   >
                     Abmelden
                   </button>
@@ -309,14 +309,14 @@ const Navbar = ({ username = 'Demo User' }: NavbarProps) => {
         
         {/* Mobile Menu - GEÄNDERT */}
         {menuOpen && (
-          <div className={`md:hidden pb-4 border-t ${darkMode ? 'border-gray-800' : 'border-gray-100'} transition-colors duration-300`}>
+          <div className={`md:hidden pb-4 border-t ${darkMode ? 'border-stone-800' : 'border-gray-100'} transition-colors duration-300`}>
             <div className="flex flex-col space-y-3 pt-3">
               <button 
                 onClick={() => {
                   router.push('/depot');
                   setMenuOpen(false);
                 }} 
-                className={`text-sm ${darkMode ? 'text-gray-300 hover:text-red-400' : 'text-gray-900 hover:text-red-500'} font-light py-2 transition-colors duration-300`}
+                className={`text-sm ${darkMode ? 'text-stone-300 hover:text-red-400' : 'text-gray-900 hover:text-red-500'} font-light py-2 transition-colors duration-300`}
               >
                 Portfolio
               </button>
@@ -325,7 +325,7 @@ const Navbar = ({ username = 'Demo User' }: NavbarProps) => {
                   router.push('/chartsuche');
                   setMenuOpen(false);
                 }} 
-                className={`text-sm ${darkMode ? 'text-gray-300 hover:text-red-400' : 'text-gray-900 hover:text-red-500'} font-light py-2 transition-colors duration-300`}
+                className={`text-sm ${darkMode ? 'text-stone-300 hover:text-red-400' : 'text-gray-900 hover:text-red-500'} font-light py-2 transition-colors duration-300`}
               >
                 Assetsuche
               </button>
@@ -334,11 +334,11 @@ const Navbar = ({ username = 'Demo User' }: NavbarProps) => {
                   router.push('/backtest');
                   setMenuOpen(false);
                 }} 
-                className={`text-sm ${darkMode ? 'text-gray-300 hover:text-red-400' : 'text-gray-900 hover:text-red-500'} font-light py-2 transition-colors duration-300`}
+                className={`text-sm ${darkMode ? 'text-stone-300 hover:text-red-400' : 'text-gray-900 hover:text-red-500'} font-light py-2 transition-colors duration-300`}
               >
                 Strategie
               </button>
-              <div className={`pt-3 border-t ${darkMode ? 'border-gray-800 text-gray-300' : 'border-gray-100 text-gray-700'} text-sm font-light transition-colors duration-300`}>
+              <div className={`pt-3 border-t ${darkMode ? 'border-stone-800 text-stone-300' : 'border-gray-100 text-gray-700'} text-sm font-light transition-colors duration-300`}>
                 {username}
               </div>
             </div>

@@ -19,9 +19,9 @@ export default function Login() {
   };
 
   return (
-    <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
+    <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-stone-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
       {/* Vertikale Linie als Design-Element */}
-      <div className={`fixed h-screen w-px ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} left-1/2 -translate-x-1/2 z-0 transition-colors duration-300`}></div>
+      <div className={`fixed h-screen w-px ${darkMode ? 'bg-stone-700' : 'bg-gray-100'} left-1/2 -translate-x-1/2 z-0 transition-colors duration-300`}></div>
       
       {/* Header mit Logo */}
       <header className="py-8 text-center relative z-10">
@@ -44,14 +44,14 @@ export default function Login() {
           
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className={`block text-sm font-light ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>Email</label>
+              <label className={`block text-sm font-light ${darkMode ? 'text-stone-400' : 'text-gray-600'} mb-2`}>Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
                   darkMode 
-                    ? 'bg-gray-800 text-white border-gray-700' 
+                    ? 'bg-stone-800 text-white border-stone-700' 
                     : 'bg-white text-gray-900 border-gray-300'
                 }`}
                 required
@@ -59,14 +59,14 @@ export default function Login() {
             </div>
             
             <div>
-              <label className={`block text-sm font-light ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>Passwort</label>
+              <label className={`block text-sm font-light ${darkMode ? 'text-stone-400' : 'text-gray-600'} mb-2`}>Passwort</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
                   darkMode 
-                    ? 'bg-gray-800 text-white border-gray-700' 
+                    ? 'bg-stone-800 text-white border-stone-700' 
                     : 'bg-white text-gray-900 border-gray-300'
                 }`}
                 required
@@ -78,7 +78,7 @@ export default function Login() {
                 type="submit"
                 className={`w-full py-3 border text-red-500 hover:bg-red-500 hover:text-white transition-colors duration-300 font-light tracking-wide ${
                   darkMode 
-                    ? 'bg-gray-900 border-red-500' 
+                    ? 'bg-stone-900 border-red-500' 
                     : 'bg-white border-red-500'
                 }`}
               >
@@ -88,7 +88,7 @@ export default function Login() {
           </form>
           
           <div className="mt-8 text-center text-sm font-light">
-            <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+            <p className={darkMode ? 'text-stone-400' : 'text-gray-600'}>
               Noch kein Konto?{' '}
               <Link href="/auth/register" className="text-red-500 hover:underline">
                 Registrieren

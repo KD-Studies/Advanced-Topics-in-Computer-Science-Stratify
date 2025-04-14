@@ -49,7 +49,7 @@ export default function ChartSuche() {
   );
 
   return (
-    <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
+    <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-stone-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
       <Navbar username="John Doe" />
       
       {/* Container ohne max-w-7xl, damit volle Breite genutzt wird */}
@@ -58,14 +58,14 @@ export default function ChartSuche() {
           {/* Header */}
           <div className="mb-16 text-center">
             <h1 className="text-4xl font-serif mb-3">Märkte</h1>
-            <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} font-light max-w-2xl mx-auto transition-colors duration-300`}>
+            <p className={`${darkMode ? 'text-stone-400' : 'text-gray-600'} font-light max-w-2xl mx-auto transition-colors duration-300`}>
               Entdecken Sie Handelsmöglichkeiten in verschiedenen Märkten
             </p>
           </div>
 
           {/* Top Performers */}
           <div className="mb-24">
-            <h2 className={`font-serif text-2xl mb-12 flex items-center after:content-[''] after:h-px after:flex-grow ${darkMode ? 'after:bg-gray-700' : 'after:bg-gray-200'} after:ml-6 transition-colors duration-300`}>
+            <h2 className={`font-serif text-2xl mb-12 flex items-center after:content-[''] after:h-px after:flex-grow ${darkMode ? 'after:bg-stone-700' : 'after:bg-gray-200'} after:ml-6 transition-colors duration-300`}>
               Top Empfehlungen
             </h2>
             
@@ -73,7 +73,7 @@ export default function ChartSuche() {
               {topPerformers.map((asset, index) => (
                 <div 
                   key={asset.id}
-                  className={`${darkMode ? 'bg-gray-900 border-gray-700 hover:border-red-500' : 'bg-white border-gray-200 hover:border-red-400'} border-t pt-8 transition-colors cursor-pointer group`}
+                  className={`${darkMode ? 'bg-stone-900 border-stone-700 hover:border-red-500' : 'bg-white border-gray-200 hover:border-red-400'} border-t pt-8 transition-colors cursor-pointer group`}
                   onClick={() => router.push(`/chart/${asset.id}`)}
                 >
                   <div className="flex justify-between items-start mb-8">
@@ -82,7 +82,7 @@ export default function ChartSuche() {
                         <h3 className="text-2xl font-serif">{asset.name}</h3>
                         <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} transition-colors duration-300`}>{asset.symbol}</span>
                       </div>
-                      <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'} text-xs mt-2 font-light transition-colors duration-300`}>
+                      <p className={`${darkMode ? 'text-stone-400' : 'text-gray-500'} text-xs mt-2 font-light transition-colors duration-300`}>
                         {asset.type === 'crypto' ? 'Kryptowährung' : 'Aktie'}
                       </p>
                     </div>
@@ -121,7 +121,7 @@ export default function ChartSuche() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
                     darkMode 
-                      ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                      ? 'bg-stone-800 text-white border-stone-700 placeholder-stone-500' 
                       : 'bg-white text-gray-900 border-gray-200 placeholder-gray-400'
                   }`}
                 />

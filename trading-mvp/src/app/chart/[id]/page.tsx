@@ -196,7 +196,7 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
   });
 
   return (
-    <main className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
+    <main className={`min-h-screen ${darkMode ? 'bg-stone-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
       <Navbar username="John Doe" />
       
       {/* Sidebar wird bereits angepasst, wenn die Komponente aktualisiert wird */}
@@ -209,7 +209,7 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h1 className="text-3xl font-serif mb-1">{crypto.name}</h1>
-                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-sm font-light`}>
+                <p className={`${darkMode ? 'text-stone-400' : 'text-gray-600'} text-sm font-light`}>
                   {crypto.symbol} • ${crypto.price.toLocaleString()}
                   <span className={`ml-2 ${crypto.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                     {crypto.change24h >= 0 ? '+' : ''}{crypto.change24h}%
@@ -228,15 +228,14 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
                   options={{ 
                     responsive: true, 
                     maintainAspectRatio: false,
-                    // Chart-Hintergrund im Dark Mode anpassen
-                    backgroundColor: darkMode ? '#1a1a1a' : '#fff',
+                    backgroundColor: darkMode ? '#1a1a18' : '#fff', // Dunklerer Granit-Ton
                     plugins: {
                       legend: { display: false },
                       tooltip: {
-                        backgroundColor: darkMode ? '#333' : 'white',
+                        backgroundColor: darkMode ? '#2a2a28' : 'white', // Dunklerer Granit-Ton
                         titleColor: darkMode ? '#fff' : '#1a1a1a',
                         bodyColor: darkMode ? '#ddd' : '#555555',
-                        borderColor: darkMode ? '#555' : '#e5e5e5',
+                        borderColor: darkMode ? '#444442' : '#e5e5e5', // Dunklerer Granit-Ton
                         borderWidth: 1,
                         padding: 12,
                         titleFont: {
@@ -260,11 +259,10 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
                               backgroundColor: signal.type.includes('long') ? 'rgba(0,255,0,1)' : 'rgba(255,0,0,1)',
                               radius: 8,
                               borderWidth: 2,
-                              borderColor: darkMode ? '#222' : '#fff', // Rahmenfarbe anpassen
+                              borderColor: darkMode ? '#333' : '#fff', // Dunklerer Rahmen für Granitlook
                               z: 100,
                             };
                             const labelId = `label-${index}`;
-                            // Rest der Annotation-Konfiguration...
                             acc[labelId] = {
                               type: 'label',
                               xValue: signal.index,
@@ -276,7 +274,7 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
                                 : (signal.type.includes('open') ? '🔴 SHORT' : '🔴 CLOSE SHORT'),
                               font: { weight: 'bold', size: 12 },
                               color: signal.type.includes('long') ? '#00ff00' : '#ff0000',
-                              backgroundColor: darkMode ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.7)', // Hintergrund etwas dunkler
+                              backgroundColor: darkMode ? 'rgba(32,32,32,0.9)' : 'rgba(0,0,0,0.7)', // Granit-ähnlicher Hintergrund
                               padding: 4,
                               borderRadius: 4,
                               z: 101
@@ -289,20 +287,18 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
                     scales: {
                       x: {
                         grid: { 
-                          color: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.03)',
-                          // Horizontale Linien im Dark Mode stärker hervorheben
+                          color: darkMode ? 'rgba(70, 70, 68, 0.15)' : 'rgba(0, 0, 0, 0.03)', // Dunklerer Granit-Ton
                           z: -1 
                         },
                         ticks: { 
-                          color: darkMode ? '#aaa' : '#888',
+                          color: darkMode ? '#888' : '#888',
                           font: { family: "'Inter', sans-serif", size: 10, weight: 300 } 
                         },
                       },
                       y: {
                         position: 'right',
                         grid: { 
-                          color: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.03)',
-                          // Vertikale Linien im Dark Mode stärker hervorheben
+                          color: darkMode ? 'rgba(70, 70, 68, 0.15)' : 'rgba(0, 0, 0, 0.03)', // Dunklerer Granit-Ton
                           z: -1 
                         },
                         ticks: {
@@ -313,11 +309,9 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
                     },
                     elements: {
                       line: {
-                        // Linie etwas stärker im Dark Mode
                         borderWidth: darkMode ? 2.5 : 2,
                       },
                       point: {
-                        // Nur bestimmte Punkte hervorheben
                         radius: 0,
                         hoverRadius: 6,
                         hoverBorderWidth: 2,
@@ -332,11 +326,11 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
           </div>
           
           {/* Tab-Schalter HIERHER verschoben - NACH dem Chart */}
-          <div className={`border-b ${darkMode ? 'border-gray-800' : 'border-gray-100'} transition-colors duration-300 mb-8`}>
+          <div className={`border-b ${darkMode ? 'border-stone-800' : 'border-gray-100'} transition-colors duration-300 mb-8`}>
             <div className="flex space-x-8">
               <button
                 onClick={() => setActiveTab('new')}
-                className={`pb-4 text-sm font-light ${activeTab === 'new' ? 'border-b border-red-500 text-red-500' : `${darkMode ? 'text-gray-400' : 'text-gray-500'}`}`}
+                className={`pb-4 text-sm font-light ${activeTab === 'new' ? 'border-b border-red-500 text-red-500' : `${darkMode ? 'text-stone-400' : 'text-gray-500'}`}`}
               >
                 Neue Position
               </button>
@@ -366,7 +360,7 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
                         defaultValue="1000" 
                         className={`w-full p-3 border focus:ring-1 focus:ring-red-500 focus:outline-none font-light transition-colors duration-300 ${
                           darkMode 
-                            ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                            ? 'bg-stone-800 text-white border-stone-700 placeholder-stone-500' 
                             : 'bg-white text-gray-900 border-gray-200 placeholder-gray-400'
                         }`}
                       />

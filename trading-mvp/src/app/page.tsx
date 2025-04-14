@@ -24,7 +24,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className={`min-h-screen overflow-hidden ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
+    <main className={`min-h-screen overflow-hidden ${darkMode ? 'bg-stone-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
       {/* Theme Toggle in der oberen rechten Ecke */}
       <div className="absolute top-6 right-6 z-50">
         <ThemeToggle />
@@ -61,11 +61,11 @@ export default function Home() {
               onClick={scrollToOffers} 
               className={`px-10 py-3 transition-colors duration-300 tracking-wide ${
                 darkMode 
-                  ? 'bg-red-500 text-gray-900 hover:bg-red-600' 
+                  ? 'bg-red-500 text-stone-900 hover:bg-red-600' 
                   : 'bg-red-500 text-white hover:bg-red-600'
               }`}
             >
-              HEUTE STARTEN
+              STARTEN
             </button>
             
             <button 
@@ -83,7 +83,7 @@ export default function Home() {
       </section>
       
       {/* Pricing Section */}
-      <section id="angebote" className={`py-32 px-6 relative z-10 ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-colors duration-300`}>
+      <section id="angebote" className={`py-32 px-6 relative z-10 ${darkMode ? 'bg-stone-800' : 'bg-gray-50'} transition-colors duration-300`}>
         <div className="max-w-7xl mx-auto">
           <h3 className="text-4xl font-serif mb-20 text-center relative">
             <span className="relative">

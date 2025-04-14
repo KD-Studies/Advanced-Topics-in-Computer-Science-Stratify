@@ -52,7 +52,7 @@ const AssetSidebar = ({ assets, activeAssetId }: AssetSidebarProps) => {
 
   return (
     <div className={`hidden md:block w-64 fixed left-0 top-16 bottom-0 overflow-y-auto z-30 pt-6 border-r transition-colors duration-300 ${
-      darkMode ? 'bg-gray-900 text-white border-gray-800' : 'bg-white text-gray-900 border-gray-100'
+      darkMode ? 'bg-stone-900 text-white border-stone-800' : 'bg-white text-gray-900 border-gray-100'
     }`}>
       <div className="px-4 mb-6">
         <h3 className={`text-xl font-serif mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Assets</h3>
@@ -65,7 +65,7 @@ const AssetSidebar = ({ assets, activeAssetId }: AssetSidebarProps) => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full text-sm border rounded-none p-2 pl-8 focus:ring-1 focus:ring-red-500 focus:outline-none font-light ${
               darkMode 
-                ? 'bg-gray-800 text-white border-gray-700 placeholder-gray-500' 
+                ? 'bg-stone-800 text-white border-stone-700 placeholder-stone-500' 
                 : 'bg-white text-gray-800 border-gray-200 placeholder-gray-400'
             }`}
           />
@@ -113,10 +113,10 @@ const AssetSidebar = ({ assets, activeAssetId }: AssetSidebarProps) => {
                 className={`w-full flex items-center py-3 px-4 text-sm transition border-l-2 ${
                   assetId === activeAssetId 
                     ? darkMode
-                      ? 'border-l-red-500 bg-gray-800 text-white' 
+                      ? 'border-l-red-500 bg-stone-800 text-white' 
                       : 'border-l-red-500 bg-gray-50 text-gray-900' 
                     : darkMode 
-                      ? 'border-l-transparent text-gray-300 hover:bg-gray-800' 
+                      ? 'border-l-transparent text-stone-300 hover:bg-stone-800' 
                       : 'border-l-transparent text-gray-700 hover:bg-gray-50'
                 }`}
               >
@@ -172,10 +172,10 @@ const AssetSidebar = ({ assets, activeAssetId }: AssetSidebarProps) => {
                 className={`w-full flex items-center py-3 px-4 text-sm transition border-l-2 ${
                   assetId === activeAssetId 
                     ? darkMode
-                      ? 'border-l-red-500 bg-gray-800 text-white' 
+                      ? 'border-l-red-500 bg-stone-800 text-white' 
                       : 'border-l-red-500 bg-gray-50 text-gray-900' 
                     : darkMode 
-                      ? 'border-l-transparent text-gray-300 hover:bg-gray-800' 
+                      ? 'border-l-transparent text-stone-300 hover:bg-stone-800' 
                       : 'border-l-transparent text-gray-700 hover:bg-gray-50'
                 }`}
               >

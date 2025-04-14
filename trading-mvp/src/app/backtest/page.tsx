@@ -104,7 +104,7 @@ export default function Backtest() {
   const selectedBacktest = backtestResults[selectedStrategy as keyof typeof backtestResults];
 
   return (
-    <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
+    <main className={`min-h-screen flex flex-col ${darkMode ?  'bg-stone-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
       <Navbar username="John Doe" />
       
       {/* Container ohne max-w-7xl, damit volle Breite genutzt wird */}
