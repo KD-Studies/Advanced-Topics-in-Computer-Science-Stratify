@@ -70,9 +70,7 @@ export default function Register() {
 
   return (
     <main className={`min-h-screen flex flex-col ${darkMode ? 'bg-stone-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
-      {/* Vertikale Linie als Design-Element */}
-      <div className={`fixed h-screen w-px ${darkMode ? 'bg-stone-700' : 'bg-gray-100'} left-1/2 -translate-x-1/2 z-0 transition-colors duration-300`}></div>
-      
+
       {/* Header mit Logo und ThemeToggle */}
       <header className="py-8 text-center relative z-10">
         <div className="flex items-center justify-center">

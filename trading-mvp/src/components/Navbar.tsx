@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '@/context/ThemeContext';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -251,6 +252,16 @@ const Navbar = ({ username = 'Demo User' }: NavbarProps) => {
               >
                 Strategie
               </button>
+              <Link 
+                href="/news" 
+                className={`px-4 py-2 mr-2 text-sm font-light transition-colors ${
+                  darkMode
+                    ? 'text-gray-300 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                News
+              </Link>
             </div>
           </div>
           
@@ -337,6 +348,15 @@ const Navbar = ({ username = 'Demo User' }: NavbarProps) => {
                 className={`text-sm ${darkMode ? 'text-stone-300 hover:text-red-400' : 'text-gray-900 hover:text-red-500'} font-light py-2 transition-colors duration-300`}
               >
                 Strategie
+              </button>
+              <button 
+                onClick={() => {
+                  router.push('/news');
+                  setMenuOpen(false);
+                }} 
+                className={`text-sm ${darkMode ? 'text-stone-300 hover:text-red-400' : 'text-gray-900 hover:text-red-500'} font-light py-2 transition-colors duration-300`}
+              >
+                News
               </button>
               <div className={`pt-3 border-t ${darkMode ? 'border-stone-800 text-stone-300' : 'border-gray-100 text-gray-700'} text-sm font-light transition-colors duration-300`}>
                 {username}
