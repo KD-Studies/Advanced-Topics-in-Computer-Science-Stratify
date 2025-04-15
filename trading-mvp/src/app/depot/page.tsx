@@ -303,7 +303,8 @@ export default function Depot() {
       
       {/* Hauptcontainer mit Abstand zur Sidebar auf Desktop */}
       <div className="ml-0 md:ml-64 flex-grow w-full transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Füge eine neue innere Div mit max-width-Beschränkung hinzu */}
+        <div className="max-w-screen-xl w-full px-6 py-12">
           <div className="mb-12">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end">
               <div>
@@ -409,7 +410,7 @@ export default function Depot() {
                 options={{
                   responsive: true,
                   maintainAspectRatio: false,
-                  backgroundColor: darkMode ? '#1a1a18' : '#fff', // Hier wird der Chart-Hintergrund gesetzt
+                  backgroundColor: darkMode ? '#1a1a1a' : '#fff', // Hier wird der Chart-Hintergrund gesetzt
                   plugins: {
                     legend: {
                       display: false,

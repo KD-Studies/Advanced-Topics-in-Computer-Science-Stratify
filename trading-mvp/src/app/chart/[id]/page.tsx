@@ -37,6 +37,7 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { darkMode } = useTheme(); // Dark Mode-Status abrufen
   const [activeTab, setActiveTab] = useState('new');
+  const [autoOpen, setAutoOpen] = useState(false);
   
   // Define AssetData type to match the interface in AssetSidebar
   type AssetType = "crypto" | "stock";
@@ -364,6 +365,34 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
                             : 'bg-white text-gray-900 border-gray-200 placeholder-gray-400'
                         }`}
                       />
+                    </div>
+                    
+                    {/* Automatische Positionseröffnung Toggle */}
+                    <div className="mb-8">
+                      <div className="flex items-center justify-between">
+                        <label className={`${darkMode ? 'text-stone-400' : 'text-gray-500'} text-sm font-light`}>Automatisch eröffnen</label>
+                        <button 
+                          onClick={() => setAutoOpen(!autoOpen)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none ${
+                            autoOpen 
+                              ? 'bg-red-500' 
+                              : darkMode ? 'bg-stone-700' : 'bg-gray-200'
+                          }`}
+                        >
+                          <span className="sr-only">Automatisch eröffnen</span>
+                          <span 
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                              autoOpen ? 'translate-x-6' : 'translate-x-1'
+                            }`} 
+                          />
+                        </button>
+                      </div>
+                      
+                      {autoOpen && (
+                        <p className={`mt-2 text-xs font-light ${darkMode ? 'text-stone-400' : 'text-gray-500'}`}>
+                          Die Position wird automatisch basierend auf den KI-Empfehlungen eröffnet.
+                        </p>
+                      )}
                     </div>
                     
                     <div className="flex space-x-6">

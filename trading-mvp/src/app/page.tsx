@@ -30,9 +30,7 @@ export default function Home() {
         <ThemeToggle />
       </div>
       
-      {/* Vertikale Linie als Design-Element */}
-      <div className={`fixed h-screen w-px ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} left-1/2 -translate-x-1/2 z-0 transition-colors duration-300`}></div>
-      
+
       {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-6 z-10">
         <div className={`transition-opacity duration-1000 ${animateIn ? 'opacity-100' : 'opacity-0'}`}>
