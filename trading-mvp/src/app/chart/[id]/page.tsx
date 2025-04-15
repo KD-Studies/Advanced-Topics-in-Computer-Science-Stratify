@@ -32,12 +32,23 @@ ChartJS.register(
   annotationPlugin
 );
 
+// This function creates random numbers used in your chart
+const randomGaussian = () => {
+  let u = 0, v = 0;
+  while(u === 0) u = Math.random();
+  while(v === 0) v = Math.random();
+  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+};
+
 export default function CryptoChart({ params }: { params: { id: string } }) {
   const { id } = params;
   const router = useRouter();
   const { darkMode } = useTheme(); // Dark Mode-Status abrufen
   const [activeTab, setActiveTab] = useState('new');
   const [autoOpen, setAutoOpen] = useState(false);
+  
+  // Add state to track the current asset ID for chart data
+  const [currentChartId, setCurrentChartId] = useState(id);
   
   // Define AssetData type to match the interface in AssetSidebar
   type AssetType = "crypto" | "stock";
@@ -52,6 +63,72 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
     volume?: string;
     sector?: string;
   }
+  
+  // Add position interface
+  interface Position {
+    id: string;
+    assetId: string;
+    type: 'long' | 'short';
+    openPrice: number;
+    currentPrice: number;
+    amount: number;
+    leverage: number;
+    openDate: string;
+    pnl: number;
+    pnlPercent: number;
+  }
+  
+  // Sample active positions
+  const [activePositions] = useState<Position[]>([
+    {
+      id: 'pos1',
+      assetId: 'bitcoin',
+      type: 'long',
+      openPrice: 48500,
+      currentPrice: 50000,
+      amount: 0.1,
+      leverage: 5,
+      openDate: '2025-04-10',
+      pnl: 750,
+      pnlPercent: 3.09
+    },
+    {
+      id: 'pos2',
+      assetId: 'ethereum',
+      type: 'short',
+      openPrice: 1850,
+      currentPrice: 1800,
+      amount: 2,
+      leverage: 3,
+      openDate: '2025-04-12',
+      pnl: 300,
+      pnlPercent: 2.7
+    },
+    {
+      id: 'pos3',
+      assetId: 'solana',
+      type: 'long',
+      openPrice: 115.20,
+      currentPrice: 120.50,
+      amount: 12,
+      leverage: 2,
+      openDate: '2025-04-14',
+      pnl: 636,
+      pnlPercent: 4.6
+    },
+    {
+      id: 'pos4',
+      assetId: 'tsla',
+      type: 'short',
+      openPrice: 275.30,
+      currentPrice: 260.52,
+      amount: 5,
+      leverage: 2,
+      openDate: '2025-04-08',
+      pnl: 1478,
+      pnlPercent: 10.7
+    }
+  ]);
   
   // Kombiniere Crypto und Stock Daten
   const allAssets: Record<string, AssetData> = {
@@ -73,17 +150,9 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
   const validAssetIds = Object.keys(allAssets);
   const isValidId = validAssetIds.includes(id);
 
-  // Hilfsfunktion: Box-Muller, um normalverteilte Zufallswerte zu erzeugen
-  const randomGaussian = () => {
-    let u = 0, v = 0;
-    while(u === 0) u = Math.random(); // u darf nicht null sein
-    while(v === 0) v = Math.random();
-    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-  };
-
   // MOVED HERE: Function defined before being used in useState
   // Funktion zur Simulation der Chart-Daten mittels GBM
-  const generateChartData = () => {
+  const generateChartData = useCallback(() => {
     // Use the properly typed id for calculations
     const assetSeed = isValidId 
       ? id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
@@ -174,18 +243,15 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
       signals,
       volumeData,
     };
-  };
+  }, [id, isValidId, crypto.price, crypto.name]); // Add dependencies that affect chart generation
   
-  // Zuerst müssen wir die Dataset-Generierung anpassen, um Dark Mode zu berücksichtigen
+  // Create chart data state that only updates when the asset ID changes
   const [chartData, setChartData] = useState(() => {
     const baseData = generateChartData();
-    
-    // Wir nutzen die generateChartData Funktion, passen aber die Farben dynamisch an
     return {
       ...baseData,
       datasets: [{
         ...baseData.datasets[0],
-        // Dynamische Farben basierend auf Dark Mode und Kursänderung
         borderColor: crypto.change24h >= 0 
           ? 'rgba(75,192,100,1)' 
           : 'rgba(255,92,92,1)',
@@ -195,6 +261,43 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
       }]
     };
   });
+  
+  // Update chart data only when ID changes
+  useEffect(() => {
+    if (id !== currentChartId) {
+      const baseData = generateChartData();
+      setChartData({
+        ...baseData,
+        datasets: [{
+          ...baseData.datasets[0],
+          borderColor: crypto.change24h >= 0 
+            ? 'rgba(75,192,100,1)' 
+            : 'rgba(255,92,92,1)',
+          backgroundColor: crypto.change24h >= 0 
+            ? darkMode ? 'rgba(75,192,100,0.15)' : 'rgba(75,192,100,0.2)' 
+            : darkMode ? 'rgba(255,92,92,0.15)' : 'rgba(255,92,92,0.2)',
+        }]
+      });
+      setCurrentChartId(id);
+    }
+  }, [id, currentChartId, generateChartData, crypto.change24h, darkMode]);
+  
+  // Only update colors when dark mode changes
+  useEffect(() => {
+    setChartData(prevData => ({
+      ...prevData,
+      datasets: [{
+        ...prevData.datasets[0],
+        backgroundColor: crypto.change24h >= 0 
+          ? darkMode ? 'rgba(75,192,100,0.15)' : 'rgba(75,192,100,0.2)' 
+          : darkMode ? 'rgba(255,92,92,0.15)' : 'rgba(255,92,92,0.2)',
+      }]
+    }));
+  }, [darkMode, crypto.change24h]);
+
+  // Filter positions for current asset
+  const currentAssetPositions = activePositions.filter(pos => pos.assetId === id);
+  const hasPositions = currentAssetPositions.length > 0;
 
   return (
     <main className={`min-h-screen ${darkMode ? 'bg-stone-900 text-white' : 'bg-white text-gray-900'} transition-colors duration-300`}>
@@ -408,9 +511,72 @@ export default function CryptoChart({ params }: { params: { id: string } }) {
               ) : (
                 <div>
                   <h3 className="text-xl font-serif mb-8">Aktive Positionen</h3>
-                  <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'} font-light`}>
-                    Keine aktiven Positionen für {crypto.name}.
-                  </p>
+                  
+                  {!hasPositions ? (
+                    <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'} font-light`}>
+                      Keine aktiven Positionen für {crypto.name}.
+                    </p>
+                  ) : (
+                    <div className={`rounded-lg overflow-hidden border ${darkMode ? 'border-stone-800' : 'border-gray-200'}`}>
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className={`${darkMode ? 'bg-stone-800' : 'bg-gray-50'}`}>
+                          <tr>
+                            <th className={`px-6 py-3 text-left text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider`}>Typ</th>
+                            <th className={`px-6 py-3 text-left text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider`}>Eröffnungskurs</th>
+                            <th className={`px-6 py-3 text-left text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider`}>Aktueller Kurs</th>
+                            <th className={`px-6 py-3 text-left text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider`}>Betrag</th>
+                            <th className={`px-6 py-3 text-left text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider`}>Investitionsbetrag</th>
+                            <th className={`px-6 py-3 text-left text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider`}>P&L</th>
+                            <th className={`px-6 py-3 text-right text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider`}>Aktionen</th>
+                          </tr>
+                        </thead>
+                        <tbody className={`${darkMode ? 'bg-stone-900' : 'bg-white'} divide-y ${darkMode ? 'divide-stone-800' : 'divide-gray-200'}`}>
+                          {currentAssetPositions.map((position) => {
+                            // Berechne den Investitionsbetrag
+                            const investmentAmount = (position.amount * position.openPrice) / position.leverage;
+                            
+                            return (
+                              <tr key={position.id}>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                    position.type === 'long' 
+                                      ? 'bg-green-100 text-green-800' 
+                                      : 'bg-red-100 text-red-800'
+                                  }`}>
+                                    {position.type === 'long' ? 'Long' : 'Short'}
+                                  </span>
+                                </td>
+                                <td className={`px-6 py-4 whitespace-nowrap text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                  ${position.openPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                </td>
+                                <td className={`px-6 py-4 whitespace-nowrap text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                  ${position.currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                </td>
+                                <td className={`px-6 py-4 whitespace-nowrap text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                  {position.amount} {crypto.symbol}
+                                </td>
+                                <td className={`px-6 py-4 whitespace-nowrap text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                  ${investmentAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className={`text-sm font-medium ${position.pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    ${position.pnl.toLocaleString()}
+                                  </div>
+                                  <div className={`text-xs ${position.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                    {position.pnl >= 0 ? '+' : ''}{position.pnlPercent.toFixed(2)}%
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                  <button className="text-red-600 hover:text-red-900 mr-3">Schließen</button>
+                                  <button className={`${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-900'}`}>Details</button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
